@@ -10,20 +10,34 @@
 
 - deixar tsconfig.json assim:
 
-  {
-  "compilerOptions": {
-  "target": "es2017",
-  "module": "commonjs",
-  "esModuleInterop": true,
-  "forceConsistentCasingInFileNames": true,
-  "strict": false,
-  "skipLibCheck": true,
-  "typeRoots": ["./src/@types", "node_modules/@types"]
-  }
+        {
+          "compilerOptions": {
+            "target": "es2017",
+            "module": "commonjs",
+            "esModuleInterop": true,
+            "forceConsistentCasingInFileNames": true,
+            "strict": false,
+            "skipLibCheck": true,
+            "rootDir": "src",
+            "outDir": "dist",
+            "typeRoots": ["./src/@types", "node_modules/@types"]
+          }
+        }
 
 - adicionar no package.json:
 
-  "type": "module",
-  "scripts": {
-  "dev": "ts-node-dev --exit-child src/app.ts"
-  },
+        {
+          .
+          .
+          .
+          "type": "module",
+          "scripts": {
+            "dev": "ts-node-dev --exit-child src/app.ts",
+            "build": "tsc --build"
+          },
+          .
+          .
+          .
+        }
+
+## End
