@@ -1,4 +1,4 @@
-# Authorization API do Curso Cominicações entre Microsserviços
+# Sales API do Curso Cominicações entre Microsserviços
 
 ### Criar/iniciar uma aplicação em node com Typescript
 
