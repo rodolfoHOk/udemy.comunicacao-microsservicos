@@ -1,5 +1,23 @@
 # Comunicacao entre Microsservicos - Udemy
 
+## Resumo do curso
+
+- Comunicação síncrona entre serviços utilizando chamadas de API REST
+
+- Comunicação assíncrona entre serviços utilizando AMQP com RabbitMQ e fila de mensagens
+
+- Criação de containers para aplicações, bancos de dados e comunicação
+
+- Criação de APIs utilizando Java com Spring Boot e PostgreSQL
+
+- Criação de APIs utilizando Javascript ES6, Nodejs, Expressjs e MongoDB
+
+- Comunicação entre containers utilizando Docker-Compose
+
+- Como realizar o deploy de microsserviços no Heroku
+
+- Como proteger sua aplicação com variáveis de ambiente
+
 ## Docker containers
 
 - Criar container do banco de dados de autenticação (PostgreSQL):
