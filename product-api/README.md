@@ -8,6 +8,8 @@
 
 - Configurando o PostgreSQL na aplicação
 
--
+- Criando as entidades de Produto, Fornecedor e Categoria
+
+- 
 
 ### END
