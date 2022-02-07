@@ -3,6 +3,6 @@ import { Router } from 'express';
 
 const authRouter = Router();
 
-authRouter.post('/api/auth', AuthController.getAccessToken);
+authRouter.post('/', AuthController.getAccessToken);
 
 export default authRouter;

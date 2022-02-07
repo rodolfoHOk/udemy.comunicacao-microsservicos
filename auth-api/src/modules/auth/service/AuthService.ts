@@ -38,7 +38,7 @@ class AuthService {
       this.validateAccessData(email, password);
 
       let user = await UserRepository.findByEmail(email);
-      UserService.validateUser(user);
+      UserService.validateUserByEmail(user);
       await this.validatePassword(password, user.password);
 
       const authUser: AuthUser = {

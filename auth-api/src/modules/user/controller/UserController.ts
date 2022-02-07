@@ -2,7 +2,8 @@ import { Request, Response } from 'express';
 import UserService from '../service/UserService';
 
 interface Params {
-  email: string;
+  email?: string;
+  id?: string;
 }
 
 interface User {
@@ -22,13 +23,22 @@ interface Problem {
   message: string;
 }
 
+interface AuthUserInfoRequest extends Request<Params> {
+  authUser: User;
+}
+
 class UserController {
   async findByEmail(
-    req: Request<Params>,
+    req: AuthUserInfoRequest,
     res: Response<UserResponse | Problem>
   ) {
-    let user = await UserService.findByEmail(req);
-    return res.status(user.status).json(user);
+    let result = await UserService.findByEmail(req);
+    return res.status(result.status).json(result);
+  }
+
+  async findById(req: Request<Params>, res: Response<UserResponse | Problem>) {
+    const result = await UserService.findById(req);
+    return res.status(result.status).json(result);
   }
 }
 

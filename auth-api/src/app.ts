@@ -2,7 +2,6 @@ import express, { Express } from 'express';
 import * as db from './config/db/initialData';
 import userRouter from './modules/user/router/UserRouter';
 import authRouter from './modules/auth/router/AuthRouter';
-import checkToken from './config/auth/checkToken';
 
 const env = process.env;
 const PORT = env.PORT || 8080;
@@ -13,10 +12,8 @@ db.createInitialData();
 
 app.use(express.json());
 
-app.use(userRouter);
-app.use(authRouter);
-
-app.use(checkToken);
+app.use('/api/users/', userRouter);
+app.use('/api/auth', authRouter);
 
 app.get('/api/status', (req, res) => {
   return res.status(200).json({
