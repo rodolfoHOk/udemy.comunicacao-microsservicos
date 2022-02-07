@@ -4,3 +4,28 @@ server:
 spring:
   application:
     name: Product API
+    
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    url: jdbc:postgresql://localhost:5432/product-db
+    username: postgres
+    password: postgres
+    tomcat:
+      max-active: 3
+      max-idle: 3
+    
+  sql:
+    init:
+      mode: always
+      continue-on-error: true
+      platform: postgresql
+      
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format-sql: true 
+      

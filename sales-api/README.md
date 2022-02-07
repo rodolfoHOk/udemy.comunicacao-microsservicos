@@ -1,5 +1,13 @@
 # Sales API do Curso Cominicações entre Microsserviços
 
+## Resumo da implementação do Micro-serviço de Vendas:
+
+- Criação do projeto Sales API com Node.js, Express.js, JWT e MongoDB
+
+- Criação do Dockerfile do projeto de Sales API
+
+- 
+
 ### Criar/iniciar uma aplicação em node com Typescript
 
 - yarn init -y

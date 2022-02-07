@@ -1,5 +1,27 @@
 # Authorization API do Curso Cominicações entre Microsserviços
 
+## Resumo da implementação do Micro-serviço de Autenticação:
+
+- Criação do projeto Auth API com Node.js, Express.js, JWT e PostgreSQL
+
+- Criação do Dockerfile do projeto de Auth API
+
+- Configurando o Sequelize no projeto
+
+- Criando os dados inicial do serviço
+
+- Dividindo a aplicação em camadas
+
+- Criando o repository e a service
+
+- Criando exceptions e as camadas de controller e router
+
+- Desenvolvendo a autenticação com JWT
+
+- Adicionando o middleware de autenticação
+
+- Implementando segurança nos endpoints
+
 ### Criar/iniciar uma aplicação em node com Typescript
 
 - yarn init -y
@@ -42,4 +64,6 @@
 
 - adicionar .gitignore para node
 
-## End
+## Links
+
+[Repositório dos Projetos do Curso](https://github.com/rodolfoHOk/udemy.comunicacao-microsservicos)
