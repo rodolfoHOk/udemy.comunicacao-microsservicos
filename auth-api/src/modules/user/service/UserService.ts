@@ -1,7 +1,8 @@
+import { Request } from 'express';
+
 import UserRepository from '../repository/UserRepository';
 import * as httpStatus from '../../../config/constants/httpStatus';
 import UserException from '../exception/UserException';
-import { Request } from 'express';
 import { UserInstance } from '../model/User';
 
 interface Params {
