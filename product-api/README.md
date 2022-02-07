@@ -10,6 +10,8 @@
 
 - Criando as entidades de Produto, Fornecedor e Categoria
 
+- Inserindo os dados iniciais
+
 - 
 
 ### END
