@@ -1,6 +1,12 @@
 import UserRepository from '../repository/UserRepository';
 import * as httpStatus from '../../../config/constants/httpStatus';
+import UserException from '../exception/UserException';
 import { Request } from 'express';
+import { UserInstance } from '../model/User';
+
+interface Params {
+  email: string;
+}
 
 interface User {
   id?: number;
@@ -20,17 +26,12 @@ interface Problem {
 }
 
 class UserService {
-  async findByEmail(req: Request<User>): Promise<UserResponse | Problem> {
+  async findByEmail(req: Request<Params>): Promise<UserResponse | Problem> {
     try {
       const { email } = req.params;
       this.validateEmail(email);
       let user = await UserRepository.findByEmail(email);
-      if (!user) {
-        return {
-          status: httpStatus.BAD_REQUEST,
-          message: 'Not exist user with informed email',
-        };
-      }
+      this.validateUser(user);
       return {
         status: httpStatus.OK,
         user: {
@@ -47,9 +48,21 @@ class UserService {
     }
   }
 
-  validateEmail(email: string) {
+  validateEmail(email: string): void {
     if (!email) {
-      throw new Error('User email was not informed');
+      throw new UserException(
+        httpStatus.BAD_REQUEST,
+        'User email was not informed'
+      );
+    }
+  }
+
+  validateUser(user: UserInstance): void {
+    if (!user) {
+      throw new UserException(
+        httpStatus.NOT_FOUND,
+        'Not exist user with informed email'
+      );
     }
   }
 }

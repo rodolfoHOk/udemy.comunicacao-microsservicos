@@ -1,7 +1,7 @@
-import User from '../model/User';
+import User, { UserInstance } from '../model/User';
 
 class UserRepository {
-  async findById(id: number) {
+  async findById(id: number): Promise<UserInstance> {
     try {
       return await User.findOne({ where: { id } });
     } catch (err) {
@@ -9,7 +9,7 @@ class UserRepository {
     }
   }
 
-  async findByEmail(email: string) {
+  async findByEmail(email: string): Promise<UserInstance> {
     try {
       return await User.findOne({ where: { email } });
     } catch (err) {

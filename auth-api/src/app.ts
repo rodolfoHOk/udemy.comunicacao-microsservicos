@@ -1,5 +1,6 @@
 import express, { Express } from 'express';
 import * as db from './config/db/initialData';
+import userRouter from './modules/user/router/UserRouter';
 
 const env = process.env;
 const PORT = env.PORT || 8080;
@@ -7,6 +8,10 @@ const PORT = env.PORT || 8080;
 const app: Express = express();
 
 db.createInitialData();
+
+app.use(express.json());
+
+app.use(userRouter);
 
 app.get('/api/status', (req, res) => {
   return res.status(200).json({
