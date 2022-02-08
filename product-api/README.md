@@ -16,8 +16,8 @@
 
 - Criando método POST para Produto e Fornecedor
 
-- Testando POSTs criados [e adicionando buscas com métodos GET para Categoria (36/8:21)]
+- Testando POSTs criados e adicionando buscas com métodos GET para Categoria
 
-- 
+- Criando endpoints com métodos GET para Produto e Fornecedores
 
-### END
+-

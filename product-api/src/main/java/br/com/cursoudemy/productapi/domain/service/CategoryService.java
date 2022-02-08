@@ -1,5 +1,7 @@
 package br.com.cursoudemy.productapi.domain.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,10 +23,24 @@ public class CategoryService {
 		return categoryRepository.save(category);
 	}
 	
+	public List<Category> findByAll () {
+		return categoryRepository.findAll();
+	}
+		
 	public Category findById (Integer id) {
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ValidationException("The category id must be informed");
+		}
 		return categoryRepository
 				.findById(id)
 				.orElseThrow(() -> new ValidationException("There no category for the given id"));
+	}
+	
+	public List<Category> findByDescription (String description) {
+		if (ObjectUtils.isEmpty(description)) {
+			throw new ValidationException("The category description must be informed");
+		}
+		return categoryRepository.findByDescriptionIgnoreCaseContaining(description);
 	}
 	
 	private void validateCategoryNameInformed(Category category) {
@@ -32,4 +48,5 @@ public class CategoryService {
 			throw new ValidationException("The category description was not informed");
 		}
 	}
+	
 }

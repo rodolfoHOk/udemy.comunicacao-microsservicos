@@ -1,5 +1,7 @@
 package br.com.cursoudemy.productapi.domain.service;
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,6 +33,40 @@ public class ProductService {
 		product.setCategory(category);
 		product.setSupplier(supplier);
 		return productRepository.save(product);
+	}
+	
+	public List<Product> findAll() {
+		return productRepository.findAll();
+	}
+	
+	public Product findById (Integer id) {
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ValidationException("The product id must be informed");
+		}
+		return productRepository
+				.findById(id)
+				.orElseThrow(() -> new ValidationException("There no product for the given id"));
+	}
+	
+	public List<Product> findByName (String name) {
+		if (ObjectUtils.isEmpty(name)) {
+			throw new ValidationException("The product name must be informed");
+		}
+		return productRepository.findByNameIgnoreCaseContaining(name);
+	}
+	
+	public List<Product> findByCategoryId (Integer categoryId) {
+		if (ObjectUtils.isEmpty(categoryId)) {
+			throw new ValidationException("The product category Id must be informed");
+		}
+		return productRepository.findByCategoryId(categoryId);
+	}
+	
+	public List<Product> findBySupplierId (Integer supplierId) {
+		if (ObjectUtils.isEmpty(supplierId)) {
+			throw new ValidationException("The product supplier Id must be informed");
+		}
+		return productRepository.findBySupplierId(supplierId);
 	}
 
 	private void validateProductDataInformed(Product product) {
