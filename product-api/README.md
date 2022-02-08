@@ -20,4 +20,6 @@
 
 - Criando endpoints com métodos GET para Produto e Fornecedores
 
--
+- Finalizando nosso CRUD com métodos PUT (atualização) e DELETE (remoção)
+
+- 

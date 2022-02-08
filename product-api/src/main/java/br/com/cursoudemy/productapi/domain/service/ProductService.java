@@ -3,6 +3,7 @@ package br.com.cursoudemy.productapi.domain.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
@@ -40,9 +41,7 @@ public class ProductService {
 	}
 	
 	public Product findById (Integer id) {
-		if (ObjectUtils.isEmpty(id)) {
-			throw new ValidationException("The product id must be informed");
-		}
+		validateInformedId(id);
 		return productRepository
 				.findById(id)
 				.orElseThrow(() -> new ValidationException("There no product for the given id"));
@@ -67,6 +66,35 @@ public class ProductService {
 			throw new ValidationException("The product supplier Id must be informed");
 		}
 		return productRepository.findBySupplierId(supplierId);
+	}
+	
+	@Transactional
+	public void delete (Integer id) {
+		validateInformedId(id);
+		try {
+			productRepository.deleteById(id);
+		} catch (EmptyResultDataAccessException ex) {
+			throw new ValidationException("Not exist product with id " + id);
+		}
+	}
+	
+	@Transactional
+	public Product update (Product product, Integer id) {
+		validateInformedId(id);
+		validateProductDataInformed(product);
+		findById(id);
+		var category = categoryService.findById(product.getCategory().getId());
+		var supplier = supplierService.findById(product.getSupplier().getId());
+		product.setCategory(category);
+		product.setSupplier(supplier);
+		product.setId(id);
+		return productRepository.save(product);
+	}
+	
+	private void validateInformedId (Integer id) {
+		if (ObjectUtils.isEmpty(id)) {
+			throw new ValidationException("The product id must be informed");
+		}
 	}
 
 	private void validateProductDataInformed(Product product) {
