@@ -14,6 +14,10 @@
 
 - Criando estrutura inicial de DTO, Repository, Service e Controller de Categoria
 
+- Criando método POST para Produto e Fornecedor
+
+- Testando POSTs criados [e adicionando buscas com métodos GET para Categoria (36/8:21)]
+
 - 
 
 ### END

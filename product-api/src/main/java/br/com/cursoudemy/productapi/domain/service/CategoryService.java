@@ -21,6 +21,12 @@ public class CategoryService {
 		return categoryRepository.save(category);
 	}
 	
+	public Category findById (Integer id) {
+		return categoryRepository
+				.findById(id)
+				.orElseThrow(() -> new ValidationException("There no category for the given id"));
+	}
+	
 	private void validateCategoryNameInformed(Category category) {
 		if (ObjectUtils.isEmpty(category.getDescription())) {
 			throw new ValidationException("The category description was not informed");

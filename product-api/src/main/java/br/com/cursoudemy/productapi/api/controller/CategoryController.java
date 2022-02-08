@@ -13,7 +13,7 @@ import br.com.cursoudemy.productapi.api.dto.CategoryResponse;
 import br.com.cursoudemy.productapi.domain.service.CategoryService;
 
 @RestController
-@RequestMapping("/api/category")
+@RequestMapping("/api/categories")
 public class CategoryController {
 
 	@Autowired
