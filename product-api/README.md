@@ -12,6 +12,8 @@
 
 - Inserindo os dados iniciais
 
+- Criando estrutura inicial de DTO, Repository, Service e Controller de Categoria
+
 - 
 
 ### END
