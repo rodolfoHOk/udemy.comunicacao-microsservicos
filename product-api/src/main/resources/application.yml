@@ -5,6 +5,9 @@ spring:
   application:
     name: Product API
     
+  main: 
+    allow-bean-definition-overriding: true
+    
   datasource:
     driver-class-name: org.postgresql.Driver
     url: jdbc:postgresql://localhost:5432/product-db
@@ -27,9 +30,28 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.PostgreSQLDialect
-        format-sql: true 
+        format-sql: true
+        
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+    
         
 app-config:
   jwt:
     api-secret: ${API-SECRET:Y3Vyc28tY29tdW5pY2FjYW8tZW50cmUtbWljcm9zc2Vydmljb3MtYXV0aC1hcGktZGV2}
+  
+  rabbit:
+    exchange:
+      product: product.topic
+      
+    routingKey:
+      product-stock: product-stock-update.routingKey
+      sales-confirmation: sales-confirmation.routingKey
+
+    queue:
+      product-stock: product-stock-update.queue
+      sales-confirmation: sales-confirmation.queue
       

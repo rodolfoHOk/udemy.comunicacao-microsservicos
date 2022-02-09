@@ -26,4 +26,6 @@
 
 - Adicionando interceptador de token JWT nos endpoints
 
+- Configurando o RabbitMQ
+
 - 
