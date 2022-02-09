@@ -9,6 +9,7 @@ import org.springframework.util.ObjectUtils;
 
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
 import br.com.cursoudemy.productapi.domain.exception.ValidationException;
+import br.com.cursoudemy.productapi.domain.listener.dto.ProductStockDTO;
 import br.com.cursoudemy.productapi.domain.model.Product;
 import br.com.cursoudemy.productapi.domain.repository.ProductRepository;
 
@@ -116,6 +117,10 @@ public class ProductService {
 		if (!productRepository.existsById(id)) {
 			throw new ResourceNotFoundException("Not exist product with id " + id);
 		}
+	}
+
+	public void updateProductStock(ProductStockDTO productStockDTO) {
+				
 	}
 
 }

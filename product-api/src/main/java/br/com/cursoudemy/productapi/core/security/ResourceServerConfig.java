@@ -15,7 +15,7 @@ import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 @EnableWebSecurity
 public class ResourceServerConfig extends WebSecurityConfigurerAdapter{
 	
-	@Value("${app-config.jwt.api-secret}")
+	@Value("${app-config.security.api-secret}")
 	private String apiSecret;
 	
 	@Override

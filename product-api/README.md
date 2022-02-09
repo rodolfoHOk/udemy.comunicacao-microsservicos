@@ -28,4 +28,6 @@
 
 - Configurando o RabbitMQ
 
+- Adicionando os Listener da fila de atualização do estoque do produto
+
 - 
