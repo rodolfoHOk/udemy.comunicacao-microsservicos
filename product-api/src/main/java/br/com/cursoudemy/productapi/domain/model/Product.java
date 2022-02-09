@@ -49,4 +49,8 @@ public class Product {
 		createdAt = OffsetDateTime.now();
 	}
 	
+	public void updateStock(Integer quantity) {
+		quantityAvailable = quantityAvailable - quantity;
+	}
+	
 }

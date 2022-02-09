@@ -12,7 +12,12 @@ import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import br.com.cursoudemy.productapi.domain.listener.dto.ProductStockDTO;
 import br.com.cursoudemy.productapi.domain.model.Product;
 import br.com.cursoudemy.productapi.domain.repository.ProductRepository;
+import br.com.cursoudemy.productapi.domain.sender.SalesConfirmationSender;
+import br.com.cursoudemy.productapi.domain.sender.dto.SalesConfirmationDTO;
+import br.com.cursoudemy.productapi.domain.sender.enums.SalesStatus;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Service
 public class ProductService {
 	
@@ -26,6 +31,9 @@ public class ProductService {
 	
 	@Autowired
 	private SupplierService supplierService;
+	
+	@Autowired
+	private SalesConfirmationSender salesConfirmationSender;
 	
 	@Transactional
 	public Product save (Product product) {
@@ -89,6 +97,53 @@ public class ProductService {
 		return productRepository.save(product);
 	}
 	
+	@Transactional
+	public void updateProductStock(ProductStockDTO productStockDTO) {
+		try {
+			validateStockUpdateData(productStockDTO);
+			validateQuantityInStock(productStockDTO);
+			productStockDTO.getProducts().forEach(salesProduct -> {
+				var existingProduct = findById(salesProduct.getProductId());
+				existingProduct.updateStock(salesProduct.getQuantity());
+//				productRepository.save(existingProduct);
+			});
+			var approvedMessage = new SalesConfirmationDTO(productStockDTO.getSalesId(), SalesStatus.APPROVED);
+			salesConfirmationSender.sendSalesConfirmationMessage(approvedMessage);
+		} catch (Exception ex) {
+			if (ex instanceof ValidationException) {
+				log.error("Error while trying to update stock for message: {}", ex.getMessage());
+			} else {
+				log.error("Error while trying to update stock for message: {}", ex.getMessage(), ex);
+			}
+			var rejectedMessage = new SalesConfirmationDTO(productStockDTO.getSalesId(), SalesStatus.REJECTED);
+			salesConfirmationSender.sendSalesConfirmationMessage(rejectedMessage);
+		}
+	}
+	
+	private void validateQuantityInStock(ProductStockDTO productStockDTO) {
+		productStockDTO.getProducts().forEach(salesProduct -> {
+			var existingProduct = findById(salesProduct.getProductId());
+			if (salesProduct.getQuantity() > existingProduct.getQuantityAvailable()) {
+				throw new ValidationException(
+						String.format("The product %s is out of stock", salesProduct.getProductId()));
+			}
+		});
+	}
+	
+	private void validateStockUpdateData(ProductStockDTO productStockDTO) {
+		if (ObjectUtils.isEmpty(productStockDTO) || ObjectUtils.isEmpty(productStockDTO.getSalesId())) {
+			throw new ValidationException("The product data and sales ID must be informed");
+		}
+		if (ObjectUtils.isEmpty(productStockDTO.getProducts())) {
+			throw new ValidationException("The sales products must be informed");
+		}
+		productStockDTO.getProducts().forEach(salesProduct -> {
+			if (ObjectUtils.isEmpty(salesProduct.getProductId()) || ObjectUtils.isEmpty(salesProduct.getQuantity())) {
+				throw new ValidationException("The product ID and the quantity must be informed");
+			}
+		});
+	}
+	
 	private void validateInformedId (Integer id) {
 		if (ObjectUtils.isEmpty(id)) {
 			throw new ValidationException("The product id must be informed");
@@ -117,10 +172,6 @@ public class ProductService {
 		if (!productRepository.existsById(id)) {
 			throw new ResourceNotFoundException("Not exist product with id " + id);
 		}
-	}
-
-	public void updateProductStock(ProductStockDTO productStockDTO) {
-				
 	}
 
 }

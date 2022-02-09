@@ -30,4 +30,8 @@
 
 - Adicionando os Listener da fila de atualização do estoque do produto
 
+- Atualizando o estoque e publicando (sender) na fila de confirmação de vendas
+
+- Correção de lógica no processoa assíncrono
+
 - 
