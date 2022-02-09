@@ -9,6 +9,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import br.com.cursoudemy.productapi.domain.exception.BusinessException;
+import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
 import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -19,6 +20,15 @@ public class ApiExceptionHandler extends ResponseEntityExceptionHandler {
 	@ExceptionHandler(ValidationException.class)
 	public ResponseEntity<?> handleValidationException(ValidationException ex, WebRequest request) {
 		var status = HttpStatus.BAD_REQUEST;
+		
+		var problemDetails = new ProblemDetails(status.value(), ex.getMessage());
+		
+		return handleExceptionInternal(ex, problemDetails, new HttpHeaders(), status, request);
+	}
+	
+	@ExceptionHandler(ResourceNotFoundException.class)
+	public ResponseEntity<?> handleResourceNotFoundException(ResourceNotFoundException ex, WebRequest request) {
+		var status = HttpStatus.NOT_FOUND;
 		
 		var problemDetails = new ProblemDetails(status.value(), ex.getMessage());
 		

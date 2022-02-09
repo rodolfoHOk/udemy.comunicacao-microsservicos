@@ -7,6 +7,7 @@ const userRouter: Router = Router();
 userRouter.use(checkToken);
 
 userRouter.get('/email/:email', UserController.findByEmail);
-userRouter.get('/:id', checkToken, UserController.findById);
+userRouter.get('/:id', UserController.findById);
+// userRouter.get('/:id', checkToken, UserController.findById);
 
 export default userRouter;

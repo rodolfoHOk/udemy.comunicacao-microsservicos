@@ -22,4 +22,8 @@
 
 - Finalizando nosso CRUD com métodos PUT (atualização) e DELETE (remoção)
 
+- Configurando o JWT no projeto
+
+- Adicionando interceptador de token JWT nos endpoints
+
 - 

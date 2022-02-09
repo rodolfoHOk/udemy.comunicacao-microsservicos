@@ -36,7 +36,10 @@ class UserController {
     return res.status(result.status).json(result);
   }
 
-  async findById(req: Request<Params>, res: Response<UserResponse | Problem>) {
+  async findById(
+    req: AuthUserInfoRequest,
+    res: Response<UserResponse | Problem>
+  ) {
     const result = await UserService.findById(req);
     return res.status(result.status).json(result);
   }

@@ -3,11 +3,11 @@ package br.com.cursoudemy.productapi.domain.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
 import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import br.com.cursoudemy.productapi.domain.model.Product;
 import br.com.cursoudemy.productapi.domain.repository.ProductRepository;
@@ -44,7 +44,7 @@ public class ProductService {
 		validateInformedId(id);
 		return productRepository
 				.findById(id)
-				.orElseThrow(() -> new ValidationException("There no product for the given id"));
+				.orElseThrow(() -> new ResourceNotFoundException("There no product for the given id"));
 	}
 	
 	public List<Product> findByName (String name) {
@@ -71,18 +71,15 @@ public class ProductService {
 	@Transactional
 	public void delete (Integer id) {
 		validateInformedId(id);
-		try {
-			productRepository.deleteById(id);
-		} catch (EmptyResultDataAccessException ex) {
-			throw new ValidationException("Not exist product with id " + id);
-		}
+		validateExistById(id);
+		productRepository.deleteById(id);
 	}
 	
 	@Transactional
 	public Product update (Product product, Integer id) {
 		validateInformedId(id);
 		validateProductDataInformed(product);
-		findById(id);
+		validateExistById(id);
 		var category = categoryService.findById(product.getCategory().getId());
 		var supplier = supplierService.findById(product.getSupplier().getId());
 		product.setCategory(category);
@@ -112,6 +109,12 @@ public class ProductService {
 		}
 		if (ObjectUtils.isEmpty(product.getSupplier().getId())) {
 			throw new ValidationException("The product supplier id was not informed");
+		}
+	}
+	
+	private void validateExistById (Integer id) {
+		if (!productRepository.existsById(id)) {
+			throw new ResourceNotFoundException("Not exist product with id " + id);
 		}
 	}
 
