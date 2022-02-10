@@ -6,7 +6,9 @@
 
 - Criação do Dockerfile do projeto de Sales API
 
-- 
+- Configurando o MongoDB
+
+-
 
 ### Criar/iniciar uma aplicação em node com Typescript
 
