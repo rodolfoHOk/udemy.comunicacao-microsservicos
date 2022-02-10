@@ -1,4 +1,4 @@
-# Sales API do Curso Cominicações entre Microsserviços
+# Sales API do Curso Comunicações entre Microsserviços
 
 ## Resumo da implementação do Micro-serviço de Vendas:
 
@@ -11,6 +11,8 @@
 - Criando as models do MongoDB
 
 - Inserindo os dados iniciais
+
+- Configurando interceptador para validação de token JWT na aplicação
 
 -
 
