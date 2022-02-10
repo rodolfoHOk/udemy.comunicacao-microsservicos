@@ -8,6 +8,8 @@
 
 - Configurando o MongoDB
 
+- Criando as models do MongoDB
+
 -
 
 ### Criar/iniciar uma aplicação em node com Typescript
