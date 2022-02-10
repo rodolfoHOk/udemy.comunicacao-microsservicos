@@ -1,5 +1,6 @@
 import amqp, { Connection } from 'amqplib';
 
+import { RABBIT_MQ_URL } from '../constants/secrets';
 import {
   PRODUCT_TOPIC,
   PRODUCT_STOCK_UPDATE_ROUTING_KEY,
@@ -7,10 +8,9 @@ import {
   PRODUCT_STOCK_UPDATE_QUEUE,
   SALES_CONFIRMATION_QUEUE,
 } from './queue';
+import { listenToSalesConfirmationQueue } from '../../modules/sales/rabbitmq/salesConfirmListener';
 
-import { RABBIT_MQ_URL } from '../constants/secrets';
-
-const HALF_SECONDS = 500;
+const TWO_SECONDS = 2000;
 const HALF_MINUTE = 30000;
 const CONTAINER_ENV = 'container';
 
@@ -24,9 +24,8 @@ export async function connectRabbitMq() {
   }
 
   async function connectRabbitMqAndCreateQueues() {
-    amqp
-      .connect(RABBIT_MQ_URL)
-      .then((connection) => {
+    amqp.connect(RABBIT_MQ_URL).then(
+      (connection) => {
         console.info('Starting RabbitMQ...');
         createQueue(
           connection,
@@ -41,11 +40,14 @@ export async function connectRabbitMq() {
           PRODUCT_TOPIC
         );
         console.info('Queues and Topics were defined');
-        setTimeout(() => connection.close(), HALF_SECONDS);
-      })
-      .catch((error) => {
-        throw new Error(error);
-      });
+        setTimeout(() => connection.close(), TWO_SECONDS);
+      },
+      (error) => {
+        throw error;
+      }
+    );
+
+    setTimeout(() => listenToSalesConfirmationQueue(), TWO_SECONDS);
   }
 
   function createQueue(
@@ -54,15 +56,15 @@ export async function connectRabbitMq() {
     routingKey: string,
     topic: string
   ) {
-    connection
-      .createChannel()
-      .then((channel) => {
+    connection.createChannel().then(
+      (channel) => {
         channel.assertExchange(topic, 'topic', { durable: true });
         channel.assertQueue(queue, { durable: true });
         channel.bindQueue(queue, topic, routingKey);
-      })
-      .catch((error) => {
-        throw new Error(error);
-      });
+      },
+      (error) => {
+        throw error;
+      }
+    );
   }
 }
