@@ -22,6 +22,8 @@
 
 - Criando Sender da aplicação
 
+- Criando Repository e Service de um pedido
+
 -
 
 ### Criar/iniciar uma aplicação em node com Typescript

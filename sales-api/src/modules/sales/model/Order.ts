@@ -1,11 +1,11 @@
 import { Schema, model, Types, Model } from 'mongoose';
 
-interface IProduct {
+export interface IProduct {
   productId: number;
   quantity: number;
 }
 
-interface IUser {
+export interface IUser {
   id: string;
   name: string;
   email: string;
@@ -19,7 +19,7 @@ export interface IOrder {
   updatedAt: Date;
 }
 
-type OrderDocumentProps = {
+export type OrderDocumentProps = {
   products: Types.DocumentArray<IProduct>;
   user: Types.Subdocument<Types.ObjectId> & IUser;
 };

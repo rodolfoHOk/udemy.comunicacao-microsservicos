@@ -16,7 +16,7 @@ export interface ProductStockUpdateMessage {
   products: ProductQuantity[];
 }
 
-export function sendMessageToProductStockUpdate(
+export function sendMessageToProductStockUpdateQueue(
   message: ProductStockUpdateMessage
 ) {
   amqp.connect(RABBIT_MQ_URL).then(
