@@ -10,6 +10,8 @@
 
 - Criando as models do MongoDB
 
+- Inserindo os dados iniciais
+
 -
 
 ### Criar/iniciar uma aplicação em node com Typescript
