@@ -16,6 +16,8 @@
 
 - Configurando o RabbitMQ
 
+- Criando configuração para aguardar o container do RabbitMQ subir
+
 -
 
 ### Criar/iniciar uma aplicação em node com Typescript

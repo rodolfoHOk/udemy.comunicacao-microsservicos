@@ -5,6 +5,7 @@
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --exit-child src/app.ts",
+    "startContainer": "NODE_ENV=container node dist/app.js",
     "build": "tsc --build"
   },
   "dependencies": {
