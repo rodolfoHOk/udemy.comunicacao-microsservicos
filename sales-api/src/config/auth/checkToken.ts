@@ -1,8 +1,8 @@
 import { NextFunction, Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 
-import { UNAUTHORIZED, INTERNAL_SERVER_ERROR } from '../httpStatus';
-import { API_SECRET } from '../secrets/secrets';
+import { UNAUTHORIZED, INTERNAL_SERVER_ERROR } from '../constants/httpStatus';
+import { API_SECRET } from '../constants/secrets';
 import AuthException from './AuthException';
 
 const bearer = 'Bearer ';

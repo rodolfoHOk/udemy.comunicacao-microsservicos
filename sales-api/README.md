@@ -14,6 +14,8 @@
 
 - Configurando interceptador para validação de token JWT na aplicação
 
+- Configurando o RabbitMQ
+
 -
 
 ### Criar/iniciar uma aplicação em node com Typescript
