@@ -7,10 +7,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import br.com.cursoudemy.productapi.domain.client.SalesClient;
+import br.com.cursoudemy.productapi.domain.exception.ClientRequestException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
 import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import br.com.cursoudemy.productapi.domain.listener.dto.ProductStockDTO;
 import br.com.cursoudemy.productapi.domain.model.Product;
+import br.com.cursoudemy.productapi.domain.model.dto.ProductSales;
 import br.com.cursoudemy.productapi.domain.repository.ProductRepository;
 import br.com.cursoudemy.productapi.domain.sender.SalesConfirmationSender;
 import br.com.cursoudemy.productapi.domain.sender.dto.SalesConfirmationDTO;
@@ -34,6 +37,9 @@ public class ProductService {
 	
 	@Autowired
 	private SalesConfirmationSender salesConfirmationSender;
+	
+	@Autowired
+	private SalesClient salesClient;
 	
 	@Transactional
 	public Product save (Product product) {
@@ -117,6 +123,17 @@ public class ProductService {
 			}
 			var rejectedMessage = new SalesConfirmationDTO(productStockDTO.getSalesId(), SalesStatus.REJECTED);
 			salesConfirmationSender.sendSalesConfirmationMessage(rejectedMessage);
+		}
+	}
+	
+	public ProductSales findProductSales(Integer id) {
+		var product = findById(id);
+		try {
+			var sales = salesClient.findSalesByProductId(product.getId())
+					.orElseThrow(() -> new ResourceNotFoundException("The sales was not found by this product"));
+			return ProductSales.of(product, sales.getSalesIds());
+		} catch (Exception ex) {
+			throw new ClientRequestException("There was an error trying to get the product sales");
 		}
 	}
 	

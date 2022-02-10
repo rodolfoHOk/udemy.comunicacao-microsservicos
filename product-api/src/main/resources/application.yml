@@ -40,6 +40,10 @@ spring:
     
         
 app-config:
+
+  services:
+    sales: http://${SALES_HOST:localhost}:${SALES_PORT:8082}
+  
   security:
     api-secret: ${API-SECRET:Y3Vyc28tY29tdW5pY2FjYW8tZW50cmUtbWljcm9zc2Vydmljb3MtYXV0aC1hcGktZGV2}
   

@@ -34,4 +34,6 @@
 
 - Correção de lógica no processoa assíncrono
 
+- Configurando client HTTP para Sales API com Feign Client
+
 - 

@@ -16,8 +16,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.cursoudemy.productapi.api.assembler.ProductRequestDisassembler;
 import br.com.cursoudemy.productapi.api.assembler.ProductResponseAssembler;
+import br.com.cursoudemy.productapi.api.assembler.ProductSalesResponseAssembler;
 import br.com.cursoudemy.productapi.api.dto.ProductRequest;
 import br.com.cursoudemy.productapi.api.dto.ProductResponse;
+import br.com.cursoudemy.productapi.api.dto.ProductSalesResponse;
 import br.com.cursoudemy.productapi.api.dto.SuccessResponse;
 import br.com.cursoudemy.productapi.domain.service.ProductService;
 
@@ -71,6 +73,11 @@ public class ProductController {
 	public ProductResponse update (@PathVariable Integer id, @RequestBody ProductRequest productRequest) {
 		var product = ProductRequestDisassembler.toDomainObject(productRequest);
 		return ProductResponseAssembler.toModel(productService.update(product, id));
+	}
+	
+	@GetMapping("/{id}/sales")
+	public ProductSalesResponse findProductSales(@PathVariable Integer id) {
+		return ProductSalesResponseAssembler.toModel(productService.findProductSales(id));
 	}
 	
 }
