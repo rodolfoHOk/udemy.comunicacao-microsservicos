@@ -20,6 +20,8 @@
 
 - Criando Listener da aplicação
 
+- Criando Sender da aplicação
+
 -
 
 ### Criar/iniciar uma aplicação em node com Typescript
