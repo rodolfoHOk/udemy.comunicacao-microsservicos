@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import br.com.cursoudemy.productapi.api.assembler.ProductRequestDisassembler;
 import br.com.cursoudemy.productapi.api.assembler.ProductResponseAssembler;
 import br.com.cursoudemy.productapi.api.assembler.ProductSalesResponseAssembler;
+import br.com.cursoudemy.productapi.api.dto.ProductCheckStockRequest;
 import br.com.cursoudemy.productapi.api.dto.ProductRequest;
 import br.com.cursoudemy.productapi.api.dto.ProductResponse;
 import br.com.cursoudemy.productapi.api.dto.ProductSalesResponse;
@@ -78,6 +79,12 @@ public class ProductController {
 	@GetMapping("/{id}/sales")
 	public ProductSalesResponse findProductSales(@PathVariable Integer id) {
 		return ProductSalesResponseAssembler.toModel(productService.findProductSales(id));
+	}
+	
+	@PostMapping("/check-stock")
+	public SuccessResponse checkProductsStock(@RequestBody ProductCheckStockRequest productCheckStockRequest) {
+		productService.checkProductsStock(productCheckStockRequest.getProducts());
+		return SuccessResponse.create("The stock is ok");
 	}
 	
 }

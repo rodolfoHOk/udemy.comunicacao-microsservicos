@@ -11,6 +11,7 @@ import br.com.cursoudemy.productapi.domain.client.SalesClient;
 import br.com.cursoudemy.productapi.domain.exception.ClientRequestException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
 import br.com.cursoudemy.productapi.domain.exception.ValidationException;
+import br.com.cursoudemy.productapi.domain.listener.dto.ProductQuantityDTO;
 import br.com.cursoudemy.productapi.domain.listener.dto.ProductStockDTO;
 import br.com.cursoudemy.productapi.domain.model.Product;
 import br.com.cursoudemy.productapi.domain.model.dto.ProductSales;
@@ -107,11 +108,10 @@ public class ProductService {
 	public void updateProductStock(ProductStockDTO productStockDTO) {
 		try {
 			validateStockUpdateData(productStockDTO);
-			validateQuantityInStock(productStockDTO);
+			productStockDTO.getProducts().forEach(this::validateProductStock);
 			productStockDTO.getProducts().forEach(salesProduct -> {
 				var existingProduct = findById(salesProduct.getProductId());
 				existingProduct.updateStock(salesProduct.getQuantity());
-//				productRepository.save(existingProduct);
 			});
 			var approvedMessage = new SalesConfirmationDTO(productStockDTO.getSalesId(), SalesStatus.APPROVED);
 			salesConfirmationSender.sendSalesConfirmationMessage(approvedMessage);
@@ -137,14 +137,22 @@ public class ProductService {
 		}
 	}
 	
-	private void validateQuantityInStock(ProductStockDTO productStockDTO) {
-		productStockDTO.getProducts().forEach(salesProduct -> {
-			var existingProduct = findById(salesProduct.getProductId());
-			if (salesProduct.getQuantity() > existingProduct.getQuantityAvailable()) {
-				throw new ValidationException(
-						String.format("The product %s is out of stock", salesProduct.getProductId()));
-			}
-		});
+	public void checkProductsStock(List<ProductQuantityDTO> productsQuantity) {
+		if (ObjectUtils.isEmpty(productsQuantity)) {
+			throw new ValidationException("The products list must not be empty");
+		}
+		productsQuantity.forEach(this::validateProductStock);
+	}
+	
+	private void validateProductStock(ProductQuantityDTO productsQuantity) {
+		if (ObjectUtils.isEmpty(productsQuantity.getProductId()) 
+				|| ObjectUtils.isEmpty(productsQuantity.getQuantity())) {
+			throw new ValidationException("Product Id and quantity must be informed");
+		}
+		var product = findById(productsQuantity.getProductId());
+		if (productsQuantity.getQuantity() > product.getQuantityAvailable()) {
+			throw new ValidationException(String.format("The product %s is out of stock", product.getId()));
+		}
 	}
 	
 	private void validateStockUpdateData(ProductStockDTO productStockDTO) {
@@ -154,11 +162,6 @@ public class ProductService {
 		if (ObjectUtils.isEmpty(productStockDTO.getProducts())) {
 			throw new ValidationException("The sales products must be informed");
 		}
-		productStockDTO.getProducts().forEach(salesProduct -> {
-			if (ObjectUtils.isEmpty(salesProduct.getProductId()) || ObjectUtils.isEmpty(salesProduct.getQuantity())) {
-				throw new ValidationException("The product ID and the quantity must be informed");
-			}
-		});
 	}
 	
 	private void validateInformedId (Integer id) {
