@@ -133,6 +133,7 @@ public class ProductService {
 					.orElseThrow(() -> new ResourceNotFoundException("The sales was not found by this product"));
 			return ProductSales.of(product, sales.getSalesIds());
 		} catch (Exception ex) {
+			System.out.println(ex);
 			throw new ClientRequestException("There was an error trying to get the product sales");
 		}
 	}

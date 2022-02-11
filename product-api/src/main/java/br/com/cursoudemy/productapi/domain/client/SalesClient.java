@@ -11,7 +11,7 @@ import br.com.cursoudemy.productapi.domain.client.dto.SalesProductResponse;
 @FeignClient(name = "salesClient", contextId = "salesClient", url = "${app-config.services.sales}")
 public interface SalesClient {
 
-	@GetMapping("/api/products/{productId}")
+	@GetMapping("/api/orders/products/{productId}")
 	Optional<SalesProductResponse> findSalesByProductId(@PathVariable Integer productId);
 	
 }

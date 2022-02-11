@@ -26,6 +26,16 @@ interface OrderResponse {
   order: OrderType;
 }
 
+interface OrdersResponse {
+  status: number;
+  orders: OrderType[];
+}
+
+interface OrdersByProductIdResponse {
+  status: number;
+  salesIds: String[];
+}
+
 interface Problem {
   status: number;
   message: string;
@@ -93,20 +103,60 @@ class OrderService {
     }
   }
 
-  async findById(req: GetOrderRequest) {
+  async findById(req: GetOrderRequest): Promise<OrderResponse | Problem> {
     const { id } = req.params;
     try {
       this.validateInformedId(id);
-
       const order = await OrderRepository.findById(id);
-
       if (!order) {
         throw new OrderException(NOT_FOUND, 'The order was not found');
       }
-
       return {
         status: OK,
         order,
+      };
+    } catch (err) {
+      return {
+        status: err.status ? err.status : INTERNAL_SERVER_ERROR,
+        message: err.message,
+      };
+    }
+  }
+
+  async findAll(): Promise<OrdersResponse | Problem> {
+    try {
+      const orders = await OrderRepository.findAll();
+      if (!orders) {
+        throw new OrderException(NOT_FOUND, 'No orders were found');
+      }
+      return {
+        status: OK,
+        orders,
+      };
+    } catch (err) {
+      return {
+        status: err.status ? err.status : INTERNAL_SERVER_ERROR,
+        message: err.message,
+      };
+    }
+  }
+
+  async findByProductId(
+    req: GetOrderRequest
+  ): Promise<OrdersByProductIdResponse | Problem> {
+    const { productId } = req.params;
+    try {
+      this.validateInformedProductId(productId);
+      const orders = await OrderRepository.findByProductId(productId);
+      if (!orders) {
+        throw new OrderException(
+          NOT_FOUND,
+          'No orders were found with product id informed'
+        );
+      }
+      return {
+        status: OK,
+        salesIds: orders.map((order) => order._id.toString()),
       };
     } catch (err) {
       return {
@@ -154,6 +204,15 @@ class OrderService {
   validateInformedId(id: string) {
     if (!id) {
       throw new OrderException(BAD_REQUEST, 'The order id must be informed');
+    }
+  }
+
+  validateInformedProductId(productId: string) {
+    if (!productId) {
+      throw new OrderException(
+        BAD_REQUEST,
+        'The order product id must be informed'
+      );
     }
   }
 }

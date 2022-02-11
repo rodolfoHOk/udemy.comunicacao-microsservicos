@@ -12,6 +12,16 @@ interface OrderResponse {
   order: OrderType;
 }
 
+interface OrdersResponse {
+  status: number;
+  orders: OrderType[];
+}
+
+interface OrdersByProductIdResponse {
+  status: number;
+  salesIds: String[];
+}
+
 interface Problem {
   status: number;
   message: string;
@@ -41,6 +51,19 @@ class OrderController {
   async findById(req: GetOrderRequest, res: Response<OrderResponse | Problem>) {
     let order = await OrderService.findById(req);
     return res.status(OK).json(order);
+  }
+
+  async findAll(req: GetOrderRequest, res: Response<OrdersResponse | Problem>) {
+    let orders = await OrderService.findAll();
+    return res.status(OK).json(orders);
+  }
+
+  async findByProductId(
+    req: GetOrderRequest,
+    res: Response<OrdersByProductIdResponse | Problem>
+  ) {
+    let ordersIds = await OrderService.findByProductId(req);
+    return res.status(OK).json(ordersIds);
   }
 }
 

@@ -15,7 +15,7 @@ createInitialData();
 connectRabbitMq();
 
 app.use(express.json());
-app.use('/api/order', orderRouter);
+app.use('/api/orders', orderRouter);
 
 app.get('/api/status', async (req, res) => {
   res.status(200).json({

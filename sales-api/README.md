@@ -30,7 +30,7 @@
 
 - Criando Controller e Routes e endpoint GET por ID para os pedidos
 
--
+- Finaliza endpoints GET e testes da comunicação entre as APIs com Postman / Insomnia
 
 ### Criar/iniciar uma aplicação em node com Typescript
 
