@@ -1,5 +1,6 @@
 import { Request } from 'express';
 import { Document, Types } from 'mongoose';
+import { IncomingHttpHeaders } from 'http';
 
 import { PENDING } from '../status/OrderStatus';
 import {
@@ -33,7 +34,7 @@ interface OrdersResponse {
 
 interface OrdersByProductIdResponse {
   status: number;
-  salesIds: String[];
+  salesIds: string[];
 }
 
 interface Problem {
@@ -47,33 +48,61 @@ interface OrderData {
 
 interface CreateOrderRequest extends Request<{}, {}, OrderData> {
   authUser: IUser;
+  headers: IncomingHttpHeaders & {
+    transactionid?: string;
+    serviceid?: string;
+  };
 }
 
 interface GetOrderRequest extends Request {
   authUser: IUser;
+  headers: IncomingHttpHeaders & {
+    transactionid?: string;
+    serviceid?: string;
+  };
 }
 
 interface OrderMessage {
   salesId: string;
   status: string;
+  transactionid: string;
 }
 
 class OrderService {
   async createOrder(req: CreateOrderRequest): Promise<OrderResponse | Problem> {
     try {
+      const { transactionid, serviceid } = req.headers;
+      console.info(
+        `Request to POST orders/create with data ${JSON.stringify(
+          req.body
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+
       let orderData = req.body;
       this.validateOrderData(orderData);
       const { authorization } = req.headers;
-      await this.validateOrderStock(orderData, authorization);
+      await this.validateOrderStock(orderData, authorization, transactionid);
       const { authUser } = req;
 
-      let savedOrder = await this.saveOrder(orderData, authUser);
-      this.sendMessage(savedOrder);
+      let savedOrder = await this.saveOrder(
+        orderData,
+        authUser,
+        transactionid,
+        serviceid
+      );
+      this.sendMessage(savedOrder, transactionid);
 
-      return {
+      let response: OrderResponse = {
         status: OK,
         order: savedOrder,
       };
+
+      console.info(
+        `Response to POST orders/create with data ${JSON.stringify(
+          response
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+      return response;
     } catch (err) {
       return {
         status: err.status ? err.status : INTERNAL_SERVER_ERROR,
@@ -85,17 +114,36 @@ class OrderService {
   async updateOrder(orderMessage: string) {
     try {
       const order: OrderMessage = JSON.parse(orderMessage);
-      if (order.salesId && order.status) {
+      if (order.salesId && order.status && order.transactionid) {
         let existingOrder = await OrderRepository.findById(order.salesId);
         if (existingOrder && order.status !== existingOrder.status) {
           existingOrder.status = order.status;
           existingOrder.updatedAt = new Date();
           await OrderRepository.save(existingOrder);
+          console.info(
+            `The order has updated with the order message data ${
+              order.transactionid
+                ? '[transactionid: ' + order.transactionid + ']'
+                : ''
+            }`
+          );
         } else {
-          console.warn('The sales Id informed on order message not exist');
+          console.warn(
+            `The sales Id informed on order message not exist ${
+              order.transactionid
+                ? '[transactionid: ' + order.transactionid + ']'
+                : ''
+            }`
+          );
         }
       } else {
-        console.warn('The order message was not complete');
+        console.warn(
+          `The order message was not complete ${
+            order.transactionid
+              ? '[transactionid: ' + order.transactionid + ']'
+              : ''
+          }`
+        );
       }
     } catch (err) {
       console.error('Could not parse order message from queue');
@@ -104,17 +152,31 @@ class OrderService {
   }
 
   async findById(req: GetOrderRequest): Promise<OrderResponse | Problem> {
-    const { id } = req.params;
     try {
+      const { transactionid, serviceid } = req.headers;
+      console.info(
+        `Request to GET orders/:id with params ${JSON.stringify(
+          req.params
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+
+      const { id } = req.params;
       this.validateInformedId(id);
       const order = await OrderRepository.findById(id);
       if (!order) {
         throw new OrderException(NOT_FOUND, 'The order was not found');
       }
-      return {
+      let response: OrderResponse = {
         status: OK,
         order,
       };
+
+      console.info(
+        `Response to GET orders/:id with data ${JSON.stringify(
+          response
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+      return response;
     } catch (err) {
       return {
         status: err.status ? err.status : INTERNAL_SERVER_ERROR,
@@ -123,16 +185,30 @@ class OrderService {
     }
   }
 
-  async findAll(): Promise<OrdersResponse | Problem> {
+  async findAll(req: GetOrderRequest): Promise<OrdersResponse | Problem> {
     try {
+      const { transactionid, serviceid } = req.headers;
+      console.info(
+        `Request to GET orders with params ${JSON.stringify(
+          req.params
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+
       const orders = await OrderRepository.findAll();
       if (!orders) {
         throw new OrderException(NOT_FOUND, 'No orders were found');
       }
-      return {
+      let response: OrdersResponse = {
         status: OK,
         orders,
       };
+
+      console.info(
+        `Response to GET orders with data ${JSON.stringify(
+          response
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+      return response;
     } catch (err) {
       return {
         status: err.status ? err.status : INTERNAL_SERVER_ERROR,
@@ -144,8 +220,15 @@ class OrderService {
   async findByProductId(
     req: GetOrderRequest
   ): Promise<OrdersByProductIdResponse | Problem> {
-    const { productId } = req.params;
     try {
+      const { transactionid, serviceid } = req.headers;
+      console.info(
+        `Request to GET orders/products/:productId with params ${JSON.stringify(
+          req.params
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+
+      const { productId } = req.params;
       this.validateInformedProductId(productId);
       const orders = await OrderRepository.findByProductId(productId);
       if (!orders) {
@@ -154,10 +237,17 @@ class OrderService {
           'No orders were found with product id informed'
         );
       }
-      return {
+      let response: OrdersByProductIdResponse = {
         status: OK,
         salesIds: orders.map((order) => order._id.toString()),
       };
+
+      console.info(
+        `Response to GET orders/products/:productId with data ${JSON.stringify(
+          response
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+      return response;
     } catch (err) {
       return {
         status: err.status ? err.status : INTERNAL_SERVER_ERROR,
@@ -172,8 +262,16 @@ class OrderService {
     }
   }
 
-  async validateOrderStock(data: OrderData, bearerToken: string) {
-    let stockIsOk = await ProductClient.checkProductStock(data, bearerToken);
+  async validateOrderStock(
+    data: OrderData,
+    bearerToken: string,
+    transactionid: string
+  ) {
+    let stockIsOk = await ProductClient.checkProductStock(
+      data,
+      bearerToken,
+      transactionid
+    );
     if (!stockIsOk) {
       throw new OrderException(
         BAD_REQUEST,
@@ -182,23 +280,31 @@ class OrderService {
     }
   }
 
-  async saveOrder(orderData: OrderData, authUser: IUser): Promise<OrderType> {
+  async saveOrder(
+    orderData: OrderData,
+    authUser: IUser,
+    transactionid: string,
+    serviceid: string
+  ): Promise<OrderType> {
     let order: IOrder = {
       status: PENDING,
       user: authUser,
       createdAt: new Date(),
       updatedAt: new Date(),
       products: orderData.products,
+      transactionid,
+      serviceid,
     };
     return await OrderRepository.save(order);
   }
 
-  sendMessage(orderCreated: OrderType) {
+  sendMessage(orderCreated: OrderType, transactionid: string) {
     let message: ProductStockUpdateMessage = {
       salesId: orderCreated._id.toString(),
       products: orderCreated.products,
+      transactionid,
     };
-    sendMessageToProductStockUpdateQueue(message);
+    sendMessageToProductStockUpdateQueue(message, transactionid);
   }
 
   validateInformedId(id: string) {

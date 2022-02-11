@@ -54,7 +54,7 @@ class OrderController {
   }
 
   async findAll(req: GetOrderRequest, res: Response<OrdersResponse | Problem>) {
-    let orders = await OrderService.findAll();
+    let orders = await OrderService.findAll(req);
     return res.status(OK).json(orders);
   }
 

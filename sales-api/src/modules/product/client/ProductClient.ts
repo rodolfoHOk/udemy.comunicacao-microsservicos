@@ -15,12 +15,15 @@ interface CheckResponse {
 class ProductClient {
   async checkProductStock(
     products: Products,
-    bearerToken: string
+    bearerToken: string,
+    transactionid: string
   ): Promise<Boolean> {
     try {
-      const headers = { authorization: bearerToken };
+      const headers = { authorization: bearerToken, transactionid };
       console.info(
-        `Sending request to Product API with data: ${JSON.stringify(products)}`
+        `Sending request to Product API with data: ${JSON.stringify(
+          products
+        )} and transactionid ${transactionid}`
       );
       let response = false;
       await axios
@@ -28,15 +31,28 @@ class ProductClient {
           headers,
         })
         .then((res) => {
+          console.info(
+            `Success response from Product API with data: ${JSON.stringify(
+              res.data
+            )} and transactionid ${transactionid}`
+          );
           response = true;
         })
         .catch((err) => {
-          console.error(err.response.data);
+          console.info(
+            `Error response from Product API with data: ${JSON.stringify(
+              err.response.data
+            )} and transactionid ${transactionid}`
+          );
           response = false;
         });
       return response;
     } catch (err) {
-      console.error(err.message);
+      console.info(
+        `Error response from Product API with data: ${JSON.stringify(
+          err.message
+        )} and transactionid ${transactionid}`
+      );
       return false;
     }
   }

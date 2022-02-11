@@ -14,10 +14,12 @@ interface ProductQuantity {
 export interface ProductStockUpdateMessage {
   salesId: string;
   products: ProductQuantity[];
+  transactionid: string;
 }
 
 export function sendMessageToProductStockUpdateQueue(
-  message: ProductStockUpdateMessage
+  message: ProductStockUpdateMessage,
+  transactionid: string
 ) {
   amqp.connect(RABBIT_MQ_URL).then(
     (connection) => {
@@ -25,14 +27,16 @@ export function sendMessageToProductStockUpdateQueue(
         (channel) => {
           let jsonStringMessage = JSON.stringify(message);
           console.info(
-            `Sending message to product update stock: ${jsonStringMessage}`
+            `Sending message to product update stock: ${jsonStringMessage} and transactionid: ${transactionid}`
           );
           channel.publish(
             PRODUCT_TOPIC,
             PRODUCT_STOCK_UPDATE_ROUTING_KEY,
             Buffer.from(jsonStringMessage)
           );
-          console.info('Message was sent successfully');
+          console.info(
+            `Message was sent successfully [transactionid: ${transactionid}]`
+          );
         },
         (error) => {
           throw error;

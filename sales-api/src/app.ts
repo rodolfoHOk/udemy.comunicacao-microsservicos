@@ -4,6 +4,7 @@ import { connectMongoDB } from './config/db/mongoDbConfig';
 import { createInitialData } from './config/db/initialData';
 import { connectRabbitMq } from './config/rabbitmq/rabbitConfig';
 import orderRouter from './modules/sales/routes/OrderRouter';
+import tracing from './config/tracing';
 
 const env = process.env;
 const PORT = env.PORT || 8082;
@@ -15,7 +16,6 @@ createInitialData();
 connectRabbitMq();
 
 app.use(express.json());
-app.use('/api/orders', orderRouter);
 
 app.get('/api/status', async (req, res) => {
   res.status(200).json({
@@ -24,6 +24,10 @@ app.get('/api/status', async (req, res) => {
     httpStatus: 200,
   });
 });
+
+app.use(tracing);
+
+app.use('/api/orders', orderRouter);
 
 app.listen(PORT, () => {
   console.info(`Server started successfully at port ${PORT}`);

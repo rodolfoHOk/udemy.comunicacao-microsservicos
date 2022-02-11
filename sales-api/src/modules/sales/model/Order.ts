@@ -14,9 +14,11 @@ export interface IUser {
 export interface IOrder {
   products: IProduct[];
   user: IUser;
-  status: String;
+  status: string;
   createdAt: Date;
   updatedAt: Date;
+  transactionid: string;
+  serviceid: string;
 }
 
 export type OrderDocumentProps = {
@@ -40,6 +42,8 @@ const OrderSchema = new Schema<IOrder>({
   status: { type: String, required: true },
   createdAt: { type: Date, required: true },
   updatedAt: { type: Date, required: true },
+  transactionid: { type: String, required: true },
+  serviceid: { type: String, required: true },
 });
 
 export default model<IOrder, OrderModelType>('Order', OrderSchema);

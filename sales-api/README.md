@@ -32,6 +32,10 @@
 
 - Finaliza endpoints GET e testes da comunicação entre as APIs com Postman / Insomnia
 
+- Implementando tracing de requisições entre serviços em Sales-API
+
+- Salvando IDs de tracing de requisições na model do MongoDB
+
 ### Criar/iniciar uma aplicação em node com Typescript
 
 - yarn init -y
