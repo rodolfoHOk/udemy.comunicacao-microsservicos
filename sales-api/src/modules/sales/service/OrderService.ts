@@ -6,7 +6,7 @@ import {
   ProductStockUpdateMessage,
   sendMessageToProductStockUpdateQueue,
 } from '../../product/rabbitmq/productStockUpdateSender';
-import { PENDING } from '../status/OrderStatus';
+import { PENDING, APPROVED, REJECTED } from '../status/OrderStatus';
 import { IOrder, IProduct, IUser, OrderDocumentProps } from '../model/Order';
 import {
   BAD_REQUEST,
@@ -17,9 +17,11 @@ import { Document, Types } from 'mongoose';
 
 interface OrderResponse {
   status: number;
-  order: Document<unknown, any, IOrder> &
-    IOrder & { _id: Types.ObjectId } & OrderDocumentProps;
+  order: OrderType;
 }
+
+export type OrderType = Document<unknown, any, IOrder> &
+  IOrder & { _id: Types.ObjectId } & OrderDocumentProps;
 
 interface Problem {
   status: number;
@@ -34,6 +36,11 @@ interface AuthUserInfoRequest extends Request<{}, {}, OrderData> {
   authUser: IUser;
 }
 
+interface OrderMessage {
+  salesId: string;
+  status: string;
+}
+
 class OrderService {
   async createOrder(
     req: AuthUserInfoRequest
@@ -42,6 +49,7 @@ class OrderService {
       const { authUser } = req;
       let orderData = req.body;
       this.validateOrderData(orderData);
+      this.validateOrderStock(orderData);
 
       let order: IOrder = {
         status: PENDING,
@@ -70,9 +78,40 @@ class OrderService {
     }
   }
 
+  async updateOrder(orderMessage: string) {
+    try {
+      const order: OrderMessage = JSON.parse(orderMessage);
+      if (order.salesId && order.status) {
+        let existingOrder = await OrderRepository.findById(order.salesId);
+        if (existingOrder && order.status !== existingOrder.status) {
+          existingOrder.status = order.status;
+          await OrderRepository.save(existingOrder);
+        } else {
+          console.warn('The sales Id informed on order message not exist');
+        }
+      } else {
+        console.warn('The order message was not complete');
+      }
+    } catch (err) {
+      console.error('Could not parse order message from queue');
+      console.error(err.message);
+    }
+  }
+
   validateOrderData(data: OrderData) {
     if (!data || !data.products) {
       throw new OrderException(BAD_REQUEST, 'The products must be informed');
+    }
+  }
+
+  async validateOrderStock(data: OrderData) {
+    // todo: request for product api
+    let stockIsOut = true; // todo: depends of request
+    if (stockIsOut) {
+      throw new OrderException(
+        BAD_REQUEST,
+        'The stock is out for the products'
+      );
     }
   }
 }

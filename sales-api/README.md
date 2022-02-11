@@ -24,6 +24,8 @@
 
 - Criando Repository e Service de um pedido
 
+- Criando processamento assíncrono de recebimento de confirmação de uma venda
+
 -
 
 ### Criar/iniciar uma aplicação em node com Typescript

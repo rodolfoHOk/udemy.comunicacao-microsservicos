@@ -2,6 +2,7 @@ import amqp from 'amqplib';
 
 import { RABBIT_MQ_URL } from '../../../config/constants/secrets';
 import { SALES_CONFIRMATION_QUEUE } from '../../../config/rabbitmq/queue';
+import OrderService from '../service/OrderService';
 
 export function listenToSalesConfirmationQueue() {
   amqp.connect(RABBIT_MQ_URL).then(
@@ -11,10 +12,12 @@ export function listenToSalesConfirmationQueue() {
         (channel) => {
           channel.consume(
             SALES_CONFIRMATION_QUEUE,
-            (message) =>
+            (message) => {
               console.info(
                 `Receive message from queue: ${message.content.toString()}`
-              ),
+              );
+              OrderService.updateOrder(message.content.toString());
+            },
             { noAck: true }
           );
         },
