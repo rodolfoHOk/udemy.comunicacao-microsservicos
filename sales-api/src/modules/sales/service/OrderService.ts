@@ -1,19 +1,21 @@
 import { Request } from 'express';
+import { Document, Types } from 'mongoose';
 
-import OrderRepository from '../repository/OrderRepository';
-import OrderException from '../exception/OrderException';
-import {
-  ProductStockUpdateMessage,
-  sendMessageToProductStockUpdateQueue,
-} from '../../product/rabbitmq/productStockUpdateSender';
-import { PENDING, APPROVED, REJECTED } from '../status/OrderStatus';
-import { IOrder, IProduct, IUser, OrderDocumentProps } from '../model/Order';
+import { PENDING } from '../status/OrderStatus';
 import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   OK,
 } from '../../../config/constants/httpStatus';
-import { Document, Types } from 'mongoose';
+
+import OrderRepository from '../repository/OrderRepository';
+import OrderException from '../exception/OrderException';
+import { IOrder, IProduct, IUser, OrderDocumentProps } from '../model/Order';
+import ProductClient from '../../product/client/ProductClient';
+import {
+  ProductStockUpdateMessage,
+  sendMessageToProductStockUpdateQueue,
+} from '../../product/rabbitmq/productStockUpdateSender';
 
 interface OrderResponse {
   status: number;
@@ -46,25 +48,14 @@ class OrderService {
     req: AuthUserInfoRequest
   ): Promise<OrderResponse | Problem> {
     try {
-      const { authUser } = req;
       let orderData = req.body;
       this.validateOrderData(orderData);
-      this.validateOrderStock(orderData);
+      const { authorization } = req.headers;
+      this.validateOrderStock(orderData, authorization);
+      const { authUser } = req;
 
-      let order: IOrder = {
-        status: PENDING,
-        user: authUser,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-        products: orderData.products,
-      };
-      let orderCreated = await OrderRepository.save(order);
-
-      let message: ProductStockUpdateMessage = {
-        salesId: orderCreated._id.toString(),
-        products: orderCreated.products,
-      };
-      sendMessageToProductStockUpdateQueue(message);
+      let orderCreated = await this.saveOrder(orderData, authUser);
+      this.sendMessage(orderCreated);
 
       return {
         status: OK,
@@ -85,6 +76,7 @@ class OrderService {
         let existingOrder = await OrderRepository.findById(order.salesId);
         if (existingOrder && order.status !== existingOrder.status) {
           existingOrder.status = order.status;
+          existingOrder.updatedAt = new Date();
           await OrderRepository.save(existingOrder);
         } else {
           console.warn('The sales Id informed on order message not exist');
@@ -104,15 +96,33 @@ class OrderService {
     }
   }
 
-  async validateOrderStock(data: OrderData) {
-    // todo: request for product api
-    let stockIsOut = true; // todo: depends of request
+  async validateOrderStock(data: OrderData, bearerToken: string) {
+    let stockIsOut = await ProductClient.checkProductStock(data, bearerToken);
     if (stockIsOut) {
       throw new OrderException(
         BAD_REQUEST,
         'The stock is out for the products'
       );
     }
+  }
+
+  async saveOrder(orderData: OrderData, authUser: IUser): Promise<OrderType> {
+    let order: IOrder = {
+      status: PENDING,
+      user: authUser,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      products: orderData.products,
+    };
+    return await OrderRepository.save(order);
+  }
+
+  sendMessage(orderCreated: OrderType) {
+    let message: ProductStockUpdateMessage = {
+      salesId: orderCreated._id.toString(),
+      products: orderCreated.products,
+    };
+    sendMessageToProductStockUpdateQueue(message);
   }
 }
 

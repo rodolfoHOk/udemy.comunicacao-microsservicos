@@ -26,6 +26,8 @@
 
 - Criando processamento assíncrono de recebimento de confirmação de uma venda
 
+- Criando chamada HTTP REST para Product-API com Axios para validar estoque
+
 -
 
 ### Criar/iniciar uma aplicação em node com Typescript
