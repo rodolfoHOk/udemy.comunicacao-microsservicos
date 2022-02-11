@@ -28,6 +28,8 @@
 
 - Criando chamada HTTP REST para Product-API com Axios para validar estoque
 
+- Criando Controller e Routes e endpoint GET por ID para os pedidos
+
 -
 
 ### Criar/iniciar uma aplicação em node com Typescript

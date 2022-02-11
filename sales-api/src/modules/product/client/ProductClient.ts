@@ -22,18 +22,21 @@ class ProductClient {
       console.info(
         `Sending request to Product API with data: ${JSON.stringify(products)}`
       );
-      axios
+      let response = false;
+      await axios
         .post<CheckResponse>(`${PRODUCT_API_URL}/check-stock`, products, {
           headers,
         })
         .then((res) => {
-          return true;
+          response = true;
         })
         .catch((err) => {
-          console.error(err.response.data.message);
-          return false;
+          console.error(err.response.data);
+          response = false;
         });
+      return response;
     } catch (err) {
+      console.error(err.message);
       return false;
     }
   }

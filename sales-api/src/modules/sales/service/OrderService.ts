@@ -6,6 +6,7 @@ import {
   BAD_REQUEST,
   INTERNAL_SERVER_ERROR,
   OK,
+  NOT_FOUND,
 } from '../../../config/constants/httpStatus';
 
 import OrderRepository from '../repository/OrderRepository';
@@ -17,13 +18,13 @@ import {
   sendMessageToProductStockUpdateQueue,
 } from '../../product/rabbitmq/productStockUpdateSender';
 
+type OrderType = Document<unknown, any, IOrder> &
+  IOrder & { _id: Types.ObjectId } & OrderDocumentProps;
+
 interface OrderResponse {
   status: number;
   order: OrderType;
 }
-
-export type OrderType = Document<unknown, any, IOrder> &
-  IOrder & { _id: Types.ObjectId } & OrderDocumentProps;
 
 interface Problem {
   status: number;
@@ -34,7 +35,11 @@ interface OrderData {
   products: IProduct[];
 }
 
-interface AuthUserInfoRequest extends Request<{}, {}, OrderData> {
+interface CreateOrderRequest extends Request<{}, {}, OrderData> {
+  authUser: IUser;
+}
+
+interface GetOrderRequest extends Request {
   authUser: IUser;
 }
 
@@ -44,22 +49,20 @@ interface OrderMessage {
 }
 
 class OrderService {
-  async createOrder(
-    req: AuthUserInfoRequest
-  ): Promise<OrderResponse | Problem> {
+  async createOrder(req: CreateOrderRequest): Promise<OrderResponse | Problem> {
     try {
       let orderData = req.body;
       this.validateOrderData(orderData);
       const { authorization } = req.headers;
-      this.validateOrderStock(orderData, authorization);
+      await this.validateOrderStock(orderData, authorization);
       const { authUser } = req;
 
-      let orderCreated = await this.saveOrder(orderData, authUser);
-      this.sendMessage(orderCreated);
+      let savedOrder = await this.saveOrder(orderData, authUser);
+      this.sendMessage(savedOrder);
 
       return {
         status: OK,
-        order: orderCreated,
+        order: savedOrder,
       };
     } catch (err) {
       return {
@@ -90,6 +93,29 @@ class OrderService {
     }
   }
 
+  async findById(req: GetOrderRequest) {
+    const { id } = req.params;
+    try {
+      this.validateInformedId(id);
+
+      const order = await OrderRepository.findById(id);
+
+      if (!order) {
+        throw new OrderException(NOT_FOUND, 'The order was not found');
+      }
+
+      return {
+        status: OK,
+        order,
+      };
+    } catch (err) {
+      return {
+        status: err.status ? err.status : INTERNAL_SERVER_ERROR,
+        message: err.message,
+      };
+    }
+  }
+
   validateOrderData(data: OrderData) {
     if (!data || !data.products) {
       throw new OrderException(BAD_REQUEST, 'The products must be informed');
@@ -97,8 +123,8 @@ class OrderService {
   }
 
   async validateOrderStock(data: OrderData, bearerToken: string) {
-    let stockIsOut = await ProductClient.checkProductStock(data, bearerToken);
-    if (stockIsOut) {
+    let stockIsOk = await ProductClient.checkProductStock(data, bearerToken);
+    if (!stockIsOk) {
       throw new OrderException(
         BAD_REQUEST,
         'The stock is out for the products'
@@ -123,6 +149,12 @@ class OrderService {
       products: orderCreated.products,
     };
     sendMessageToProductStockUpdateQueue(message);
+  }
+
+  validateInformedId(id: string) {
+    if (!id) {
+      throw new OrderException(BAD_REQUEST, 'The order id must be informed');
+    }
   }
 }
 
