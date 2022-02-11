@@ -4,6 +4,7 @@ import UserRepository from '../repository/UserRepository';
 import * as httpStatus from '../../../config/constants/httpStatus';
 import UserException from '../exception/UserException';
 import { UserInstance } from '../model/User';
+import { IncomingHttpHeaders } from 'http';
 
 interface Params {
   email?: string;
@@ -29,11 +30,22 @@ interface Problem {
 
 interface AuthUserInfoRequest extends Request<Params> {
   authUser: User;
+  headers: IncomingHttpHeaders & {
+    transactionid?: string;
+    serviceid?: string;
+  };
 }
 
 class UserService {
   async findByEmail(req: AuthUserInfoRequest): Promise<UserResponse | Problem> {
     try {
+      const { transactionid, serviceid } = req.headers;
+      console.info(
+        `Request to GET users/email/:email with params ${JSON.stringify(
+          req.params
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+
       const { email } = req.params;
       this.validateEmail(email);
 
@@ -43,7 +55,7 @@ class UserService {
       const { authUser } = req;
       this.validateAuthenticatedUser(user, authUser);
 
-      return {
+      let response: UserResponse = {
         status: httpStatus.OK,
         user: {
           id: user.id,
@@ -51,6 +63,13 @@ class UserService {
           email: user.email,
         },
       };
+
+      console.info(
+        `Response to GET users/email/:email with data ${JSON.stringify(
+          response
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+      return response;
     } catch (err) {
       return {
         status: err.status ? err.status : httpStatus.INTERNAL_SERVER_ERROR,
@@ -61,6 +80,13 @@ class UserService {
 
   async findById(req: AuthUserInfoRequest): Promise<UserResponse | Problem> {
     try {
+      const { transactionid, serviceid } = req.headers;
+      console.info(
+        `Request to GET users/:id with params ${JSON.stringify(
+          req.params
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+
       const { id } = req.params;
       this.validateId(id);
 
@@ -70,7 +96,7 @@ class UserService {
       const { authUser } = req;
       this.validateAuthenticatedUser(user, authUser);
 
-      return {
+      let response: UserResponse = {
         status: httpStatus.OK,
         user: {
           id: user.id,
@@ -78,6 +104,13 @@ class UserService {
           email: user.email,
         },
       };
+
+      console.info(
+        `Response to GET users/:id with data ${JSON.stringify(
+          response
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+      return response;
     } catch (err) {
       return {
         status: err.status ? err.status : httpStatus.INTERNAL_SERVER_ERROR,

@@ -1,4 +1,5 @@
 import { Request } from 'express';
+import { IncomingHttpHeaders } from 'http';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 
@@ -8,9 +9,16 @@ import UserRepository from '../../user/repository/UserRepository';
 import UserService from '../../user/service/UserService';
 import { API_SECRET } from '../../../config/constants/secrets';
 
-interface AuthRequest {
+interface AuthRequestBody {
   email: string;
   password: string;
+}
+
+interface AuthRequest extends Request<AuthRequestBody> {
+  headers: IncomingHttpHeaders & {
+    transactionid?: string;
+    serviceid?: string;
+  };
 }
 
 interface Problem {
@@ -30,10 +38,19 @@ interface AuthResponse {
 }
 
 class AuthService {
-  async getAccessToken(
-    req: Request<AuthRequest>
-  ): Promise<AuthResponse | Problem> {
+  async getAccessToken(req: AuthRequest): Promise<AuthResponse | Problem> {
     try {
+      const { transactionid, serviceid } = req.headers;
+      let reqBodyWithoutPass: AuthRequestBody = JSON.parse(
+        JSON.stringify(req.body)
+      );
+      reqBodyWithoutPass.password = '??????????';
+      console.info(
+        `Request to POST /auth with data ${JSON.stringify(
+          reqBodyWithoutPass
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+
       const { email, password } = req.body;
       this.validateAccessData(email, password);
 
@@ -49,11 +66,17 @@ class AuthService {
       const accessToken = jwt.sign({ authUser }, API_SECRET, {
         expiresIn: '1d',
       });
-
-      return {
+      let response: AuthResponse = {
         status: httpStatus.OK,
         accessToken,
       };
+
+      console.info(
+        `Response to POST /auth with data ${JSON.stringify(
+          response
+        )} | [transactionid: ${transactionid} | serviceid: ${serviceid}]`
+      );
+      return response;
     } catch (err) {
       return {
         status: err.status ? err.status : httpStatus.INTERNAL_SERVER_ERROR,

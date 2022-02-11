@@ -22,6 +22,8 @@
 
 - Implementando segurança nos endpoints
 
+- Implementando tracing de requisições entre serviços em Auth-API
+
 ### Criar/iniciar uma aplicação em node com Typescript
 
 - yarn init -y
