@@ -22,13 +22,16 @@ public class SalesConfirmationSender {
 	
 	public void sendSalesConfirmationMessage(SalesConfirmationDTO salesConfirmationDTO) {
 		try {
-			log.info("Sending message: {}", new ObjectMapper().writeValueAsString(salesConfirmationDTO));
+			log.info("Sending message with data: {} and TransactionId: {}",
+					new ObjectMapper().writeValueAsString(salesConfirmationDTO),
+					salesConfirmationDTO.getTransactionid());
 			var productStockExchange = rabbitProperties.getExchange().getProduct();
 			var salesConfirmationKey = rabbitProperties.getRoutingKey().getSalesConfirmation();
 			rabbitTemplate.convertAndSend(productStockExchange, salesConfirmationKey, salesConfirmationDTO);
-			log.info("Message was sent successfully");
+			log.info("Message was sent successfully [TransactionId: {}]", salesConfirmationDTO.getTransactionid());
 		} catch (Exception ex) {
-			log.error("Error while trying to send sales confirmation message: ", ex);
+			log.error("Error while trying to send sales confirmation message: {} [TransactionId: {}]", ex,
+						salesConfirmationDTO.getTransactionid());
 		}
 	}
 }

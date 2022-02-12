@@ -7,8 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.ObjectUtils;
 
+import br.com.cursoudemy.productapi.core.interceptor.RequestUtils;
 import br.com.cursoudemy.productapi.domain.client.SalesClient;
-import br.com.cursoudemy.productapi.domain.exception.ClientRequestException;
+import br.com.cursoudemy.productapi.domain.client.dto.SalesProductResponse;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
 import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import br.com.cursoudemy.productapi.domain.listener.dto.ProductQuantityDTO;
@@ -26,7 +27,9 @@ import lombok.extern.slf4j.Slf4j;
 public class ProductService {
 	
 	private static final Integer ZERO = 0;
-
+	private static final String TRANSACTION_ID = "transactionid";
+	private static final String SERVICE_ID = "serviceid";
+	
 	@Autowired
 	private ProductRepository productRepository;
 	
@@ -113,29 +116,28 @@ public class ProductService {
 				var existingProduct = findById(salesProduct.getProductId());
 				existingProduct.updateStock(salesProduct.getQuantity());
 			});
-			var approvedMessage = new SalesConfirmationDTO(productStockDTO.getSalesId(), SalesStatus.APPROVED);
+			log.info("Stock updated successfully | Transaction ID: {}", productStockDTO.getTransactionid());
+			var approvedMessage = new SalesConfirmationDTO(
+					productStockDTO.getSalesId(), SalesStatus.APPROVED, productStockDTO.getTransactionid());
 			salesConfirmationSender.sendSalesConfirmationMessage(approvedMessage);
 		} catch (Exception ex) {
 			if (ex instanceof ValidationException) {
-				log.error("Error while trying to update stock for message: {}", ex.getMessage());
+				log.error("Error while trying to update stock for message: {} and TransactionId: {}",
+						ex.getMessage(), productStockDTO.getTransactionid());
 			} else {
-				log.error("Error while trying to update stock for message: {}", ex.getMessage(), ex);
+				log.error("Error while trying to update stock for message: {} and TransactionId: {}",
+						ex.getMessage(), productStockDTO.getTransactionid(), ex);
 			}
-			var rejectedMessage = new SalesConfirmationDTO(productStockDTO.getSalesId(), SalesStatus.REJECTED);
+			var rejectedMessage = new SalesConfirmationDTO(
+					productStockDTO.getSalesId(), SalesStatus.REJECTED, productStockDTO.getTransactionid());
 			salesConfirmationSender.sendSalesConfirmationMessage(rejectedMessage);
 		}
 	}
 	
 	public ProductSales findProductSales(Integer id) {
 		var product = findById(id);
-		try {
-			var sales = salesClient.findSalesByProductId(product.getId())
-					.orElseThrow(() -> new ResourceNotFoundException("The sales was not found by this product"));
-			return ProductSales.of(product, sales.getSalesIds());
-		} catch (Exception ex) {
-			System.out.println(ex);
-			throw new ClientRequestException("There was an error trying to get the product sales");
-		}
+		var sales = getSalesByProductId(product.getId());
+		return ProductSales.of(product, sales.getSalesIds());
 	}
 	
 	public void checkProductsStock(List<ProductQuantityDTO> productsQuantity) {
@@ -163,6 +165,19 @@ public class ProductService {
 		if (ObjectUtils.isEmpty(productStockDTO.getProducts())) {
 			throw new ValidationException("The sales products must be informed");
 		}
+	}
+	
+	private SalesProductResponse getSalesByProductId(Integer productId) {
+		var currentRequest = RequestUtils.getCurrentRequest();
+		var transactionid = currentRequest.getHeader(TRANSACTION_ID);
+		var serviceid = currentRequest.getAttribute(SERVICE_ID);
+		log.info("Sending GET request to orders by product ID with data {} | [TransactionID: {} | ServiceID: {}]",
+				productId, transactionid, serviceid);
+		var sales = salesClient.findSalesByProductId(productId)
+				.orElseThrow(() -> new ResourceNotFoundException("The sales was not found by this product"));
+		log.info("Receiving GET request to orders by product ID with data {} | [TransactionID: {} | ServiceID: {}]",
+				sales.toString(), transactionid, serviceid);
+		return sales;
 	}
 	
 	private void validateInformedId (Integer id) {

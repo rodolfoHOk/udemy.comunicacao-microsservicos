@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.context.request.WebRequest;
 
 import br.com.cursoudemy.productapi.api.assembler.ProductRequestDisassembler;
 import br.com.cursoudemy.productapi.api.assembler.ProductResponseAssembler;
@@ -23,10 +24,15 @@ import br.com.cursoudemy.productapi.api.dto.ProductResponse;
 import br.com.cursoudemy.productapi.api.dto.ProductSalesResponse;
 import br.com.cursoudemy.productapi.api.dto.SuccessResponse;
 import br.com.cursoudemy.productapi.domain.service.ProductService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/products")
 public class ProductController {
+	
+	private static final String TRANSACTION_ID = "transactionid";
+	private static final String SERVICE_ID = "serviceid";
 	
 	@Autowired
 	private ProductService productService;
@@ -82,9 +88,17 @@ public class ProductController {
 	}
 	
 	@PostMapping("/check-stock")
-	public SuccessResponse checkProductsStock(@RequestBody ProductCheckStockRequest productCheckStockRequest) {
+	public SuccessResponse checkProductsStock(@RequestBody ProductCheckStockRequest productCheckStockRequest,
+			WebRequest request) {
+		var transactionid = request.getHeader(TRANSACTION_ID);
+		var serviceid = request.getAttribute(SERVICE_ID, 0);
+		log.info("Request to POST product stock with data {} | [TransactionID: {} | ServiceID: {}]",
+					productCheckStockRequest.toString(), transactionid, serviceid);
 		productService.checkProductsStock(productCheckStockRequest.getProducts());
-		return SuccessResponse.create("The stock is ok");
+		var response = SuccessResponse.create("The stock is ok");
+		log.info("Response to POST product stock with data {} | [TransactionID: {} | ServiceID: {}]",
+				response.toString(), transactionid, serviceid);
+		return response;
 	}
 	
 }

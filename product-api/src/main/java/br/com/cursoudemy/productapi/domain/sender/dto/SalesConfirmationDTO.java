@@ -14,4 +14,6 @@ public class SalesConfirmationDTO {
 	
 	private SalesStatus status;
 	
+	private String transactionid;
+	
 }
