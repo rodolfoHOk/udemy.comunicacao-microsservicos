@@ -37,3 +37,5 @@
 - Configurando client HTTP para Sales API com Feign Client
 
 - Implementando último endpoint da aplicação. Verificar estoque dos produtos.
+
+- Implementando tracing das requisições entre servicos no product api
