@@ -2,6 +2,7 @@ package br.com.cursoudemy.productapi.core.interceptor;
 
 import org.springframework.stereotype.Component;
 
+import br.com.cursoudemy.productapi.core.utils.RequestUtils;
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
 
