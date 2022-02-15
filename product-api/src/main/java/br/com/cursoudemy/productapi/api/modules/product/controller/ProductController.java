@@ -2,6 +2,8 @@ package br.com.cursoudemy.productapi.api.modules.product.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -39,7 +41,7 @@ public class ProductController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public ProductResponse save (@RequestBody ProductRequest productRequest) {
+	public ProductResponse save (@Valid @RequestBody ProductRequest productRequest) {
 		var product = ProductRequestDisassembler.toDomainObject(productRequest);
 		
 		return ProductResponseAssembler.toModel(productService.save(product));
@@ -77,7 +79,7 @@ public class ProductController {
 	}
 	
 	@PutMapping("/{id}")
-	public ProductResponse update (@PathVariable Integer id, @RequestBody ProductRequest productRequest) {
+	public ProductResponse update (@PathVariable Integer id, @Valid @RequestBody ProductRequest productRequest) {
 		var product = ProductRequestDisassembler.toDomainObject(productRequest);
 		return ProductResponseAssembler.toModel(productService.update(product, id));
 	}
@@ -88,7 +90,7 @@ public class ProductController {
 	}
 	
 	@PostMapping("/check-stock")
-	public SuccessResponse checkProductsStock(@RequestBody ProductCheckStockRequest productCheckStockRequest,
+	public SuccessResponse checkProductsStock(@Valid @RequestBody ProductCheckStockRequest productCheckStockRequest,
 			WebRequest request) {
 		var transactionid = request.getHeader(TRANSACTION_ID);
 		var serviceid = request.getAttribute(SERVICE_ID, 0);

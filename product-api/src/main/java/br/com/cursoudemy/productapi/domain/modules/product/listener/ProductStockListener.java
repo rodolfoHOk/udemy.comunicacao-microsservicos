@@ -1,7 +1,10 @@
 package br.com.cursoudemy.productapi.domain.modules.product.listener;
 
+import javax.validation.Valid;
+
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -19,7 +22,7 @@ public class ProductStockListener {
 	private ProductService productService;
 	
 	@RabbitListener(queues = "${app-config.rabbit.queue.product-stock}")
-	public void receiveProductStockMessage (ProductStockDTO productStockDTO) throws JsonProcessingException {
+	public void receiveProductStockMessage (@Valid @Payload ProductStockDTO productStockDTO) throws JsonProcessingException {
 		log.info("Receiving message with data: {} and TransactionID: {}", 
 				new ObjectMapper().writeValueAsString(productStockDTO),
 				productStockDTO.getTransactionid());

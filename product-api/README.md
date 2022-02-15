@@ -39,3 +39,13 @@
 - Implementando último endpoint da aplicação. Verificar estoque dos produtos.
 
 - Implementando tracing das requisições entre servicos no product api
+
+- Refatorando a árvore de estrutura de arquivos
+
+- Refatorando para usar o spring validation and ExceptionHandler atualizado
+
+### idéias de melhorias:
+
+- todo: unit tests and integration tests
+
+- todo: openapi

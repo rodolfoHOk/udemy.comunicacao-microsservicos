@@ -9,12 +9,17 @@ import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.handler.annotation.support.DefaultMessageHandlerMethodFactory;
+import org.springframework.validation.SmartValidator;
 
 @Configuration
 public class RabbitConfig {
 	
 	@Autowired
 	private RabbitProperties rabbitProperties;
+	
+	@Autowired
+	private SmartValidator validator;
 	
 	@Bean
 	public TopicExchange productTopicExchange() {
@@ -50,6 +55,14 @@ public class RabbitConfig {
 	@Bean
 	public MessageConverter jsonMessageConverter() {
 		return new Jackson2JsonMessageConverter();
+	}
+	
+	// For Validate payload (dto) in Listener
+	@Bean
+	public DefaultMessageHandlerMethodFactory messageHandlerMethodFactory() {
+	    DefaultMessageHandlerMethodFactory factory = new DefaultMessageHandlerMethodFactory();
+	    factory.setValidator(validator);
+	    return factory;
 	}
 	
 }

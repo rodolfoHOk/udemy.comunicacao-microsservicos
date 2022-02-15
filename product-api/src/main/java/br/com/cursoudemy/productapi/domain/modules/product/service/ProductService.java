@@ -28,7 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 @Service
 public class ProductService {
 	
-	private static final Integer ZERO = 0;
 	private static final String TRANSACTION_ID = "transactionid";
 	private static final String SERVICE_ID = "serviceid";
 	
@@ -49,7 +48,6 @@ public class ProductService {
 	
 	@Transactional
 	public Product save (Product product) {
-		validateProductDataInformed(product);
 		var category = categoryService.findById(product.getCategory().getId());
 		var supplier = supplierService.findById(product.getSupplier().getId());
 		product.setCategory(category);
@@ -62,7 +60,6 @@ public class ProductService {
 	}
 	
 	public Product findById (Integer id) {
-		validateInformedId(id);
 		return productRepository
 				.findById(id)
 				.orElseThrow(() -> new ResourceNotFoundException("There no product for the given id"));
@@ -91,15 +88,12 @@ public class ProductService {
 	
 	@Transactional
 	public void delete (Integer id) {
-		validateInformedId(id);
 		validateExistById(id);
 		productRepository.deleteById(id);
 	}
 	
 	@Transactional
 	public Product update (Product product, Integer id) {
-		validateInformedId(id);
-		validateProductDataInformed(product);
 		validateExistById(id);
 		var category = categoryService.findById(product.getCategory().getId());
 		var supplier = supplierService.findById(product.getSupplier().getId());
@@ -112,8 +106,7 @@ public class ProductService {
 	@Transactional
 	public void updateProductStock(ProductStockDTO productStockDTO) {
 		try {
-			validateStockUpdateData(productStockDTO);
-			productStockDTO.getProducts().forEach(this::validateProductStock);
+			this.checkProductsStock(productStockDTO.getProducts());
 			productStockDTO.getProducts().forEach(salesProduct -> {
 				var existingProduct = findById(salesProduct.getProductId());
 				existingProduct.updateStock(salesProduct.getQuantity());
@@ -143,29 +136,13 @@ public class ProductService {
 	}
 	
 	public void checkProductsStock(List<ProductQuantityDTO> productsQuantity) {
-		if (ObjectUtils.isEmpty(productsQuantity)) {
-			throw new ValidationException("The products list must not be empty");
-		}
 		productsQuantity.forEach(this::validateProductStock);
 	}
 	
 	private void validateProductStock(ProductQuantityDTO productsQuantity) {
-		if (ObjectUtils.isEmpty(productsQuantity.getProductId()) 
-				|| ObjectUtils.isEmpty(productsQuantity.getQuantity())) {
-			throw new ValidationException("Product Id and quantity must be informed");
-		}
 		var product = findById(productsQuantity.getProductId());
 		if (productsQuantity.getQuantity() > product.getQuantityAvailable()) {
 			throw new ValidationException(String.format("The product %s is out of stock", product.getId()));
-		}
-	}
-	
-	private void validateStockUpdateData(ProductStockDTO productStockDTO) {
-		if (ObjectUtils.isEmpty(productStockDTO) || ObjectUtils.isEmpty(productStockDTO.getSalesId())) {
-			throw new ValidationException("The product data and sales ID must be informed");
-		}
-		if (ObjectUtils.isEmpty(productStockDTO.getProducts())) {
-			throw new ValidationException("The sales products must be informed");
 		}
 	}
 	
@@ -181,31 +158,7 @@ public class ProductService {
 				sales.toString(), transactionid, serviceid);
 		return sales;
 	}
-	
-	private void validateInformedId (Integer id) {
-		if (ObjectUtils.isEmpty(id)) {
-			throw new ValidationException("The product id must be informed");
-		}
-	}
 
-	private void validateProductDataInformed(Product product) {
-		if (ObjectUtils.isEmpty(product.getName())) {
-			throw new ValidationException("The product name was not informed");
-		}
-		if (ObjectUtils.isEmpty(product.getQuantityAvailable())) {
-			throw new ValidationException("The product quantity was not informed");
-		}
-		if (product.getQuantityAvailable() <= ZERO) {
-			throw new ValidationException("The product quantity should not be less or equal to zero");
-		}
-		if (ObjectUtils.isEmpty(product.getCategory().getId())) {
-			throw new ValidationException("The product category id was not informed");
-		}
-		if (ObjectUtils.isEmpty(product.getSupplier().getId())) {
-			throw new ValidationException("The product supplier id was not informed");
-		}
-	}
-	
 	private void validateExistById (Integer id) {
 		if (!productRepository.existsById(id)) {
 			throw new ResourceNotFoundException("Not exist product with id " + id);

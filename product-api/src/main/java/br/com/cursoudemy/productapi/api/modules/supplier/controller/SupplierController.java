@@ -2,6 +2,8 @@ package br.com.cursoudemy.productapi.api.modules.supplier.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +32,7 @@ public class SupplierController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public SupplierResponse save (@RequestBody SupplierRequest supplierRequest) {
+	public SupplierResponse save (@Valid @RequestBody SupplierRequest supplierRequest) {
 		var supplier = SupplierRequestDisassembler.toDomainObject(supplierRequest);
 		return SupplierResponseAssembler.toModel(supplierService.save(supplier));
 	}
@@ -57,7 +59,7 @@ public class SupplierController {
 	}
 	
 	@PutMapping("/{id}")
-	public SupplierResponse update (@PathVariable Integer id, @RequestBody SupplierRequest supplierRequest) {
+	public SupplierResponse update (@PathVariable Integer id, @Valid @RequestBody SupplierRequest supplierRequest) {
 		var supplier = SupplierRequestDisassembler.toDomainObject(supplierRequest);
 		return SupplierResponseAssembler.toModel(supplierService.update(supplier, id));
 	}

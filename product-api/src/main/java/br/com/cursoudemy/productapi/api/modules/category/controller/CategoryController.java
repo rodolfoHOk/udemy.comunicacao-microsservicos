@@ -2,6 +2,8 @@ package br.com.cursoudemy.productapi.api.modules.category.controller;
 
 import java.util.List;
 
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -30,7 +32,7 @@ public class CategoryController {
 	
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
-	public CategoryResponse save (@RequestBody CategoryRequest categoryRequest) {
+	public CategoryResponse save (@Valid @RequestBody CategoryRequest categoryRequest) {
 		var category = CategoryRequestDisassembler.toDomainObject(categoryRequest);
 		return CategoryResponseAssembler.toModel(categoryService.save(category));
 	}
@@ -57,7 +59,7 @@ public class CategoryController {
 	}
 	
 	@PutMapping("/{id}")
-	public CategoryResponse update (@PathVariable Integer id, @RequestBody CategoryRequest categoryRequest) {
+	public CategoryResponse update (@PathVariable Integer id, @Valid @RequestBody CategoryRequest categoryRequest) {
 		var category = CategoryRequestDisassembler.toDomainObject(categoryRequest);
 		return CategoryResponseAssembler.toModel(categoryService.update(category, id));
 	}
