@@ -58,7 +58,7 @@ public class ProductController {
 	}
 	
 	@GetMapping("/name/{name}")
-	public List<ProductResponse> findByCategoryId (@PathVariable String name) {
+	public List<ProductResponse> findByName (@PathVariable String name) {
 		return ProductResponseAssembler.toCollectionModel(productService.findByName(name));
 	}
 	

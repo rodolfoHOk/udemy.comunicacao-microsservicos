@@ -44,8 +44,10 @@
 
 - Refatorando para usar o spring validation and ExceptionHandler atualizado
 
+- Add openapi documentation
+
 ### idéias de melhorias:
 
 - todo: unit tests and integration tests
 
-- todo: openapi
+- todo: finish openapi

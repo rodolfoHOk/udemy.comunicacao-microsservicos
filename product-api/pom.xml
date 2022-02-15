@@ -18,6 +18,7 @@
 		<java.version>11</java.version>
 		<spring-cloud.version>2021.0.0</spring-cloud.version>
 		<oauth2-oidc-sdk.version>9.24</oauth2-oidc-sdk.version>
+		<springfox-boot-starter.version>3.0.0</springfox-boot-starter.version>
 	</properties>
 	
 	<dependencies>
@@ -94,6 +95,13 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
 		</dependency>
+		
+		<dependency>
+		    <groupId>io.springfox</groupId>
+		    <artifactId>springfox-boot-starter</artifactId>
+		    <version>${springfox-boot-starter.version}</version>
+		</dependency>
+
 	</dependencies>
 	
 	<dependencyManagement>
