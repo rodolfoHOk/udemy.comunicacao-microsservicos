@@ -21,15 +21,17 @@ import br.com.cursoudemy.productapi.api.modules.supplier.assembler.SupplierReque
 import br.com.cursoudemy.productapi.api.modules.supplier.assembler.SupplierResponseAssembler;
 import br.com.cursoudemy.productapi.api.modules.supplier.dto.SupplierRequest;
 import br.com.cursoudemy.productapi.api.modules.supplier.dto.SupplierResponse;
+import br.com.cursoudemy.productapi.api.modules.supplier.openapi.SupplierControllerOpenApi;
 import br.com.cursoudemy.productapi.domain.modules.supplier.service.SupplierService;
 
 @RestController
 @RequestMapping("/api/suppliers")
-public class SupplierController {
+public class SupplierController implements SupplierControllerOpenApi {
 	
 	@Autowired
 	private SupplierService supplierService;
 	
+	@Override
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public SupplierResponse save (@Valid @RequestBody SupplierRequest supplierRequest) {
@@ -37,27 +39,32 @@ public class SupplierController {
 		return SupplierResponseAssembler.toModel(supplierService.save(supplier));
 	}
 	
+	@Override
 	@GetMapping
 	public List<SupplierResponse> findAll() {
 		return SupplierResponseAssembler.toCollectionModel(supplierService.findAll());
 	}
 	
+	@Override
 	@GetMapping("/{id}")
 	public SupplierResponse findById (@PathVariable Integer id) {
 		return SupplierResponseAssembler.toModel(supplierService.findById(id));
 	}
 	
+	@Override
 	@GetMapping("/name/{name}")
 	public List<SupplierResponse> findByName (@PathVariable String name) {
 		return SupplierResponseAssembler.toCollectionModel(supplierService.findByName(name));
 	}
 	
+	@Override
 	@DeleteMapping("/{id}")
 	public SuccessResponse delete (@PathVariable Integer id) {
 		supplierService.delete(id);
 		return SuccessResponse.create("The supplier was deleted.");
 	}
 	
+	@Override
 	@PutMapping("/{id}")
 	public SupplierResponse update (@PathVariable Integer id, @Valid @RequestBody SupplierRequest supplierRequest) {
 		var supplier = SupplierRequestDisassembler.toDomainObject(supplierRequest);

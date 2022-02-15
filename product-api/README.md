@@ -48,6 +48,7 @@
 
 ### idéias de melhorias:
 
+- todo: finish openapi
+
 - todo: unit tests and integration tests
 
-- todo: finish openapi

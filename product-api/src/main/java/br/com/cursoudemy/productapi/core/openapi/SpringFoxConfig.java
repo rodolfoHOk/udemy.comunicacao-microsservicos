@@ -14,6 +14,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfoHandlerMapping;
 
 import com.fasterxml.classmate.TypeResolver;
@@ -52,7 +53,8 @@ public class SpringFoxConfig {
 				.globalResponses(HttpMethod.GET, globalGetResponses())
 				.globalResponses(HttpMethod.POST, globalPostPutResponses())
 				.globalResponses(HttpMethod.PUT, globalPostPutResponses())
-				.globalResponses(HttpMethod.DELETE, globalDeleteResponses());
+				.globalResponses(HttpMethod.DELETE, globalDeleteResponses())
+				.ignoredParameterTypes(WebRequest.class);
 	}
 	
 	private ApiInfo apiInfoV1() {

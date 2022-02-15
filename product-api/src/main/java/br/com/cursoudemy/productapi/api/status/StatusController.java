@@ -1,7 +1,5 @@
 package br.com.cursoudemy.productapi.api.status;
 
-import java.util.HashMap;
-
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -10,16 +8,16 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/api/status")
-public class StatusController {
+public class StatusController implements StatusControllerOpenApi {
 
 	@GetMapping
-	public ResponseEntity<HashMap<String, Object>> getApiStatus() {
-		var response = new HashMap<String, Object>();
+	public ResponseEntity<StatusResponse> getApiStatus() {
+		var statusResponse = new StatusResponse();
 		
-		response.put("service", "Product-API");
-		response.put("status", "up");
-		response.put("httpStatus", HttpStatus.OK.value());
+		statusResponse.setService("Product-API");
+		statusResponse.setStatus("up");
+		statusResponse.setHttpStatus(HttpStatus.OK.value());
 		
-		return ResponseEntity.ok(response);
+		return ResponseEntity.ok(statusResponse);
 	}
 }

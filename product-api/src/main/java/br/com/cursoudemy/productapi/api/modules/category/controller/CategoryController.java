@@ -21,15 +21,17 @@ import br.com.cursoudemy.productapi.api.modules.category.assembler.CategoryReque
 import br.com.cursoudemy.productapi.api.modules.category.assembler.CategoryResponseAssembler;
 import br.com.cursoudemy.productapi.api.modules.category.dto.CategoryRequest;
 import br.com.cursoudemy.productapi.api.modules.category.dto.CategoryResponse;
+import br.com.cursoudemy.productapi.api.modules.category.openapi.CategotyControllerOpenApi;
 import br.com.cursoudemy.productapi.domain.modules.category.service.CategoryService;
 
 @RestController
 @RequestMapping("/api/categories")
-public class CategoryController {
+public class CategoryController implements CategotyControllerOpenApi {
 
 	@Autowired
 	private CategoryService categoryService;
 	
+	@Override
 	@PostMapping
 	@ResponseStatus(HttpStatus.CREATED)
 	public CategoryResponse save (@Valid @RequestBody CategoryRequest categoryRequest) {
@@ -37,27 +39,32 @@ public class CategoryController {
 		return CategoryResponseAssembler.toModel(categoryService.save(category));
 	}
 	
+	@Override
 	@GetMapping
 	public List<CategoryResponse> findAll () {
 		return CategoryResponseAssembler.toCollectionModel(categoryService.findByAll());
 	}
 	
+	@Override
 	@GetMapping("/{id}")
 	public CategoryResponse findById (@PathVariable Integer id) {
 		return CategoryResponseAssembler.toModel(categoryService.findById(id));
 	}
 	
+	@Override
 	@GetMapping("/description/{description}")
 	public List<CategoryResponse> findByDescription (@PathVariable String description) {
 		return CategoryResponseAssembler.toCollectionModel(categoryService.findByDescription(description));
 	}
 	
+	@Override
 	@DeleteMapping("/{id}")
 	public SuccessResponse delete (@PathVariable Integer id) {
 		categoryService.delete(id);
 		return SuccessResponse.create("The category was deleted.");
 	}
 	
+	@Override
 	@PutMapping("/{id}")
 	public CategoryResponse update (@PathVariable Integer id, @Valid @RequestBody CategoryRequest categoryRequest) {
 		var category = CategoryRequestDisassembler.toDomainObject(categoryRequest);

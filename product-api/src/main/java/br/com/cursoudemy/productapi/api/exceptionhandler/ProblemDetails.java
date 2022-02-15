@@ -5,6 +5,7 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
+import io.swagger.annotations.ApiModelProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,8 +15,10 @@ import lombok.Setter;
 @JsonInclude(Include.NON_NULL)
 public class ProblemDetails {
 	
+	@ApiModelProperty(example = "400")
 	private Integer status;
 	
+	@ApiModelProperty(example = "Invalid Request (client error)")
 	private String message;
 	
 	private List<FieldsError> fieldsError;
@@ -30,8 +33,10 @@ public class ProblemDetails {
 	@AllArgsConstructor
 	public class FieldsError {
 		
+		@ApiModelProperty(example = "description")
 		private String name;
 		
+		@ApiModelProperty(example = "must not be blank")
 		private String message;
 	}
 	
