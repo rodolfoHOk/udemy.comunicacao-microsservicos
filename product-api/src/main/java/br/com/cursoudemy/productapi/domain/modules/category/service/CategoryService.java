@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import br.com.cursoudemy.productapi.domain.exception.EntityInUseException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
@@ -28,7 +27,7 @@ public class CategoryService {
 		return categoryRepository.save(category);
 	}
 	
-	public List<Category> findByAll () {
+	public List<Category> findAll () {
 		return categoryRepository.findAll();
 	}
 		
@@ -39,9 +38,6 @@ public class CategoryService {
 	}
 	
 	public List<Category> findByDescription (String description) {
-		if (ObjectUtils.isEmpty(description)) {
-			throw new ValidationException("The category description must be informed");
-		}
 		return categoryRepository.findByDescriptionIgnoreCaseContaining(description);
 	}
 	

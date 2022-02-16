@@ -42,7 +42,7 @@ public class CategoryController implements CategotyControllerOpenApi {
 	@Override
 	@GetMapping
 	public List<CategoryResponse> findAll () {
-		return CategoryResponseAssembler.toCollectionModel(categoryService.findByAll());
+		return CategoryResponseAssembler.toCollectionModel(categoryService.findAll());
 	}
 	
 	@Override
