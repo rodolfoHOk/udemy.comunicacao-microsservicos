@@ -5,7 +5,6 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.ObjectUtils;
 
 import br.com.cursoudemy.productapi.domain.exception.EntityInUseException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
@@ -39,9 +38,6 @@ public class SupplierService {
 	}
 	
 	public List<Supplier> findByName (String name) {
-		if (ObjectUtils.isEmpty(name)) {
-			throw new ValidationException("The supplier name must be informed");
-		}
 		return supplierRepository.findByNameIgnoreCaseContaining(name);
 	}
 	

@@ -111,16 +111,19 @@ public class ProductService {
 				var existingProduct = findById(salesProduct.getProductId());
 				existingProduct.updateStock(salesProduct.getQuantity());
 			});
-			log.info("Stock updated successfully | Transaction ID: {}", productStockDTO.getTransactionid());
+			log.info("Stock updated successfully | [TransactionId: {}]", productStockDTO.getTransactionid());
 			var approvedMessage = new SalesConfirmationDTO(
 					productStockDTO.getSalesId(), SalesStatus.APPROVED, productStockDTO.getTransactionid());
 			salesConfirmationSender.sendSalesConfirmationMessage(approvedMessage);
 		} catch (Exception ex) {
 			if (ex instanceof ValidationException) {
-				log.error("Error while trying to update stock for message: {} and TransactionId: {}",
+				log.error("Error while trying to update stock for message: {} | [TransactionId: {}]",
+						ex.getMessage(), productStockDTO.getTransactionid());
+			} else if (ex instanceof ResourceNotFoundException) {
+				log.error("Error while trying to update stock for message: {} | [TransactionId: {}]",
 						ex.getMessage(), productStockDTO.getTransactionid());
 			} else {
-				log.error("Error while trying to update stock for message: {} and TransactionId: {}",
+				log.error("Error while trying to update stock for message: {} | [TransactionId: {}]",
 						ex.getMessage(), productStockDTO.getTransactionid(), ex);
 			}
 			var rejectedMessage = new SalesConfirmationDTO(
@@ -161,7 +164,7 @@ public class ProductService {
 
 	private void validateExistById (Integer id) {
 		if (!productRepository.existsById(id)) {
-			throw new ResourceNotFoundException("Not exist product with id " + id);
+			throw new ValidationException("Not exist product with id " + id);
 		}
 	}
 

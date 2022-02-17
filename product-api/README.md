@@ -44,7 +44,9 @@
 
 - Refatorando para usar o spring validation and ExceptionHandler atualizado
 
-- Add OpenApi Documentation
+- Adicionando documentação OpenApi
+
+- Adicionando testes unitarios para category service
 
 ### idéias de melhorias:
 

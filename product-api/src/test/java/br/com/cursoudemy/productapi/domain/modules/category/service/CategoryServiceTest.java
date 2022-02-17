@@ -26,7 +26,6 @@ import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import br.com.cursoudemy.productapi.domain.modules.category.model.Category;
 import br.com.cursoudemy.productapi.domain.modules.category.repository.CategoryRepository;
 import br.com.cursoudemy.productapi.domain.modules.product.repository.ProductRepository;
-import br.com.cursoudemy.productapi.domain.modules.product.service.ProductService;
 
 @ExtendWith(MockitoExtension.class)
 public class CategoryServiceTest {
@@ -40,9 +39,6 @@ public class CategoryServiceTest {
 	@InjectMocks
 	private CategoryService categoryService;
 	
-	@InjectMocks
-	private ProductService productService;
-	
 	private static final Integer VALID_CATEGORY_ID = 1;
 	private static final Integer INVALID_CATEGORY_ID = 100;
 	private static final String VALID_CATEGORY_DESCRIPTION = "movies";
@@ -51,17 +47,18 @@ public class CategoryServiceTest {
 	@Test
 	void shouldReturnCreatedCategoryWhenSaveACategory() {
 		// given
-		Category category = new Category(1, "Books");
+		Category categoryToSave = new Category();
+		categoryToSave.setDescription("Books");
 		Category expectedCreatedCategory = new Category(1, "Books");
 		
 		// when
-		when(categoryRepository.save(category)).thenReturn(expectedCreatedCategory);
+		when(categoryRepository.save(categoryToSave)).thenReturn(expectedCreatedCategory);
 		
 		// then
-		Category createdCategory = categoryService.save(category);
+		Category createdCategory = categoryService.save(categoryToSave);
 		
-		assertThat(createdCategory.getId(), is(equalTo(category.getId())));
-		assertThat(createdCategory.getDescription(), is(equalTo(category.getDescription())));
+		assertThat(createdCategory.getId(), is(equalTo(expectedCreatedCategory.getId())));
+		assertThat(createdCategory.getDescription(), is(equalTo(expectedCreatedCategory.getDescription())));
 	}
 	
 	@Test
