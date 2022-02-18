@@ -48,6 +48,10 @@
 
 - Adicionando testes unitarios para category service
 
+- Adicionando testes unitarios para supplier service
+
+- Adicionando testes unitarios para product service
+
 ### idéias de melhorias:
 
 - todo: unit tests and integration tests

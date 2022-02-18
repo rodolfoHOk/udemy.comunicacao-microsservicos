@@ -22,6 +22,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.LoggerFactory;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
 import br.com.cursoudemy.productapi.domain.exception.ValidationException;
@@ -30,8 +33,10 @@ import br.com.cursoudemy.productapi.domain.modules.category.service.CategoryServ
 import br.com.cursoudemy.productapi.domain.modules.product.listener.dto.ProductQuantityDTO;
 import br.com.cursoudemy.productapi.domain.modules.product.listener.dto.ProductStockDTO;
 import br.com.cursoudemy.productapi.domain.modules.product.model.Product;
+import br.com.cursoudemy.productapi.domain.modules.product.model.dto.ProductSales;
 import br.com.cursoudemy.productapi.domain.modules.product.repository.ProductRepository;
 import br.com.cursoudemy.productapi.domain.modules.sales.client.SalesClient;
+import br.com.cursoudemy.productapi.domain.modules.sales.client.dto.SalesProductResponse;
 import br.com.cursoudemy.productapi.domain.modules.sales.sender.SalesConfirmationSender;
 import br.com.cursoudemy.productapi.domain.modules.supplier.model.Supplier;
 import br.com.cursoudemy.productapi.domain.modules.supplier.service.SupplierService;
@@ -61,7 +66,7 @@ public class ProductServiceTest {
 	
 	@Mock
 	private SalesClient salesClient;
-
+	
 	private static final Integer VALID_PRODUCT_ID = 3;
 	private static final Integer INVALID_PRODUCT_ID = 100;
 	private static final Integer VALID_PRODUCT_ID_1 = 4;
@@ -193,6 +198,7 @@ public class ProductServiceTest {
 		ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
 		listAppender.start();
 		productServiceLogger.addAppender(listAppender);
+		List<ILoggingEvent> logsList = listAppender.list;
 		
 		ProductStockDTO productStockDTO = createProductStockDTO();
 		Product product1 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_1, TEN_PRODUCT_STOCK);
@@ -209,7 +215,6 @@ public class ProductServiceTest {
 		assertThat(product1.getQuantityAvailable(), is(equalTo(FIVE_PRODUCT_STOCK)));
 		assertThat(product2.getQuantityAvailable(), is(equalTo(FIVE_PRODUCT_STOCK)));
 		assertThat(product3.getQuantityAvailable(), is(equalTo(FIVE_PRODUCT_STOCK)));
-		List<ILoggingEvent> logsList = listAppender.list;
 		assertThat(Level.INFO, is(equalTo(logsList.get(0).getLevel())));
 		assertThat(logsList.get(0).getMessage(), containsString("Stock updated successfully"));
 	}
@@ -220,6 +225,7 @@ public class ProductServiceTest {
 		ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
 		listAppender.start();
 		productServiceLogger.addAppender(listAppender);
+		List<ILoggingEvent> logsList = listAppender.list;
 		
 		ProductStockDTO productStockDTO = createProductStockDTO();
 		Product product1 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_1, TEN_PRODUCT_STOCK);
@@ -233,7 +239,6 @@ public class ProductServiceTest {
 		
 		productService.updateProductStock(productStockDTO);
 		
-		List<ILoggingEvent> logsList = listAppender.list;
 		assertThat(Level.ERROR, is(equalTo(logsList.get(0).getLevel())));
 		assertThat(logsList.get(0).getMessage(), containsString("Error while trying to update stock for message"));
 	}
@@ -244,6 +249,7 @@ public class ProductServiceTest {
 		ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
 		listAppender.start();
 		productServiceLogger.addAppender(listAppender);
+		List<ILoggingEvent> logsList = listAppender.list;
 		
 		ProductStockDTO productStockDTO = createProductStockDTOWithInvalidId();
 		Product product1 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_1, TEN_PRODUCT_STOCK);
@@ -256,19 +262,116 @@ public class ProductServiceTest {
 		
 		productService.updateProductStock(productStockDTO);
 		
-		List<ILoggingEvent> logsList = listAppender.list;
 		assertThat(Level.ERROR, is(equalTo(logsList.get(0).getLevel())));
 		assertThat(logsList.get(0).getMessage(), containsString("Error while trying to update stock for message"));
 	}
 	
 	@Test
-	void findProductSales() {
+	void shouldReturnAProductWithSalesAndLogInfosWhenFindProductSalesWithAValidIDAndProductHasSales() {
+		Logger productServiceLogger = (Logger) LoggerFactory.getLogger(ProductService.class);
+		ListAppender<ILoggingEvent> listAppender = new ListAppender<>();
+		listAppender.start();
+		productServiceLogger.addAppender(listAppender);
+		List<ILoggingEvent> logsList = listAppender.list;
 		
+		Product expectedFoundProduct = createProductWithId(VALID_PRODUCT_ID);
+		SalesProductResponse expectedFoundSalesOfProduct = createSalesProductResponse();
+		ProductSales expectedProductSales = ProductSales.of(expectedFoundProduct, expectedFoundSalesOfProduct.getSalesIds());
+		
+		when(productRepository.findById(VALID_PRODUCT_ID)).thenReturn(Optional.of(expectedFoundProduct));
+		when(salesClient.findSalesByProductId(VALID_PRODUCT_ID)).thenReturn(Optional.of(expectedFoundSalesOfProduct));
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+		
+		ProductSales foundProductSales = productService.findProductSales(VALID_PRODUCT_ID);
+		
+		assertThat(foundProductSales.getId(), is(equalTo(expectedProductSales.getId())));
+		assertThat(foundProductSales.getName(), is(equalTo(expectedProductSales.getName())));
+		assertThat(foundProductSales.getSales(), is(equalTo(expectedProductSales.getSales())));
+		assertThat(Level.INFO, is(equalTo(logsList.get(0).getLevel())));
+		assertThat(logsList.get(0).getMessage(), containsString("Sending GET request to orders by product ID"));
+		assertThat(Level.INFO, is(equalTo(logsList.get(1).getLevel())));
+		assertThat(logsList.get(1).getMessage(), containsString("Receiving GET request to orders by product ID"));
 	}
 	
 	@Test
-	void checkProductsStock() {
+	void shouldThrowAResourceNotFoundExceptionWhenFindProductSalesWithAInvalidID() {
+		when(productRepository.findById(INVALID_PRODUCT_ID)).thenReturn(Optional.empty());
 		
+		assertThrows(ResourceNotFoundException.class, () -> productService.findProductSales(INVALID_PRODUCT_ID));
+	}
+	
+	@Test
+	void shouldThrowAResourceNotFoundExceptionWhenFindProductSalesWithAValidIdAndProductHasNoSales() {
+		Product expectedFoundProduct = createProductWithId(VALID_PRODUCT_ID);
+		
+		when(productRepository.findById(VALID_PRODUCT_ID)).thenReturn(Optional.of(expectedFoundProduct));
+		when(salesClient.findSalesByProductId(VALID_PRODUCT_ID)).thenReturn(Optional.empty());
+		MockHttpServletRequest request = new MockHttpServletRequest();
+		RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(request));
+		
+		assertThrows(ResourceNotFoundException.class, () -> productService.findProductSales(VALID_PRODUCT_ID));
+	}
+	
+	@Test
+	void shouldNothingThrowWhenCheckProductsStockAndThereAreEnoughProductsInStock() {
+		ProductQuantityDTO productQuantityDTO1 = new ProductQuantityDTO(VALID_PRODUCT_ID_1, FIVE_PRODUCT_STOCK);
+		ProductQuantityDTO productQuantityDTO2 = new ProductQuantityDTO(VALID_PRODUCT_ID_2, FIVE_PRODUCT_STOCK);
+		ProductQuantityDTO productQuantityDTO3 = new ProductQuantityDTO(VALID_PRODUCT_ID_3, FIVE_PRODUCT_STOCK);
+		List<ProductQuantityDTO> productsQuantity = List.of(productQuantityDTO1, productQuantityDTO2, productQuantityDTO3);
+		Product product1 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_1, TEN_PRODUCT_STOCK);
+		Product product2 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_2, TEN_PRODUCT_STOCK);
+		Product product3 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_3, TEN_PRODUCT_STOCK);
+		
+		when(productRepository.findById(VALID_PRODUCT_ID_1)).thenReturn(Optional.of(product1));
+		when(productRepository.findById(VALID_PRODUCT_ID_2)).thenReturn(Optional.of(product2));
+		when(productRepository.findById(VALID_PRODUCT_ID_3)).thenReturn(Optional.of(product3));
+		
+		assertDoesNotThrow(() -> productService.checkProductsStock(productsQuantity));		
+	}
+	
+	@Test
+	void shouldThrowValidationExceptionWhenCheckProductsStockAndThereAreNotEnoughProductsInStock() {
+		ProductQuantityDTO productQuantityDTO1 = new ProductQuantityDTO(VALID_PRODUCT_ID_1, FIVE_PRODUCT_STOCK);
+		ProductQuantityDTO productQuantityDTO2 = new ProductQuantityDTO(VALID_PRODUCT_ID_2, FIVE_PRODUCT_STOCK);
+		ProductQuantityDTO productQuantityDTO3 = new ProductQuantityDTO(VALID_PRODUCT_ID_3, FIVE_PRODUCT_STOCK);
+		List<ProductQuantityDTO> productsQuantity = List.of(productQuantityDTO1, productQuantityDTO2, productQuantityDTO3);
+		Product product1 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_1, TEN_PRODUCT_STOCK);
+		Product product2 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_2, TEN_PRODUCT_STOCK);
+		Product product3 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_3, ONE_PRODUCT_STOCK);
+		
+		when(productRepository.findById(VALID_PRODUCT_ID_1)).thenReturn(Optional.of(product1));
+		when(productRepository.findById(VALID_PRODUCT_ID_2)).thenReturn(Optional.of(product2));
+		when(productRepository.findById(VALID_PRODUCT_ID_3)).thenReturn(Optional.of(product3));
+		
+		assertThrows(ValidationException.class, () -> productService.checkProductsStock(productsQuantity));		
+	}
+	
+	@Test
+	void shouldThrowResourceNotFoundExceptionWhenCheckProductsStockAndAnInvalidProductIdIsEncountered() {
+		ProductQuantityDTO productQuantityDTO1 = new ProductQuantityDTO(VALID_PRODUCT_ID_1, FIVE_PRODUCT_STOCK);
+		ProductQuantityDTO productQuantityDTO2 = new ProductQuantityDTO(VALID_PRODUCT_ID_2, FIVE_PRODUCT_STOCK);
+		ProductQuantityDTO productQuantityDTO3 = new ProductQuantityDTO(INVALID_PRODUCT_ID, FIVE_PRODUCT_STOCK);
+		List<ProductQuantityDTO> productsQuantity = List.of(productQuantityDTO1, productQuantityDTO2, productQuantityDTO3);
+		Product product1 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_1, TEN_PRODUCT_STOCK);
+		Product product2 = createProductWhithIdAndQuantity(VALID_PRODUCT_ID_2, TEN_PRODUCT_STOCK);
+		
+		when(productRepository.findById(VALID_PRODUCT_ID_1)).thenReturn(Optional.of(product1));
+		when(productRepository.findById(VALID_PRODUCT_ID_2)).thenReturn(Optional.of(product2));
+		when(productRepository.findById(INVALID_PRODUCT_ID)).thenReturn(Optional.empty());
+		
+		assertThrows(ResourceNotFoundException.class, () -> productService.checkProductsStock(productsQuantity));		
+	}
+	
+	private SalesProductResponse createSalesProductResponse() {
+		SalesProductResponse salesProduct = new SalesProductResponse();
+		salesProduct.setStatus(200);
+		String sale1Id = "f1c2956f-92b4-4d33-a2a5-1619e6547120";
+		String sale2Id = "84a4793f-7163-495e-8620-11dbefbcd40d";
+		String sale3Id = "1f0e574c-1fc8-40c3-bdb0-11d29ebb8002";
+		salesProduct.setSalesIds(List.of(sale1Id, sale2Id, sale3Id));
+		
+		return salesProduct;
 	}
 	
 	private ProductStockDTO createProductStockDTO() {
