@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.cursoudemy.productapi.domain.exception.EntityInUseException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
-import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import br.com.cursoudemy.productapi.domain.modules.category.model.Category;
 import br.com.cursoudemy.productapi.domain.modules.category.repository.CategoryRepository;
 import br.com.cursoudemy.productapi.domain.modules.product.repository.ProductRepository;
@@ -59,7 +58,7 @@ public class CategoryService {
 	
 	private void validateExistById (Integer id) {
 		if (!categoryRepository.existsById(id)) {
-			throw new ValidationException("Not exist category with id " + id);
+			throw new ResourceNotFoundException("Not exist category with id " + id);
 		}
 	}
 	

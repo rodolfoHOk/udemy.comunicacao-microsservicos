@@ -23,7 +23,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.cursoudemy.productapi.domain.exception.EntityInUseException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
-import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import br.com.cursoudemy.productapi.domain.modules.product.repository.ProductRepository;
 import br.com.cursoudemy.productapi.domain.modules.supplier.model.Supplier;
 import br.com.cursoudemy.productapi.domain.modules.supplier.repository.SupplierRepository;
@@ -132,10 +131,10 @@ public class SupplierServiceTest {
 	}
 	
 	@Test
-	void shouldThrowValidationExceptionWhenDeleteSupplierWithAInvalidId() {
+	void shouldThrowResourceNotFoundExceptionWhenDeleteSupplierWithAInvalidId() {
 		when(supplierRepository.existsById(INVALID_SUPPLIER_ID)).thenReturn(false);
 		
-		assertThrows(ValidationException.class, () -> supplierService.delete(INVALID_SUPPLIER_ID));
+		assertThrows(ResourceNotFoundException.class, () -> supplierService.delete(INVALID_SUPPLIER_ID));
 	}
 	
 	@Test
@@ -159,11 +158,11 @@ public class SupplierServiceTest {
 	}
 	
 	@Test
-	void shouldThrowValidationExceptionWhenUpdateSupplierWithAInvalidId() {
+	void shouldThrowResourceNotFoundExceptionWhenUpdateSupplierWithAInvalidId() {
 		Supplier expectedUpdatedSupplier = new Supplier(2, "Amazon WebStore");
 		
 		when(supplierRepository.existsById(INVALID_SUPPLIER_ID)).thenReturn(false);
 		
-		assertThrows(ValidationException.class, () -> supplierService.update(expectedUpdatedSupplier ,INVALID_SUPPLIER_ID));
+		assertThrows(ResourceNotFoundException.class, () -> supplierService.update(expectedUpdatedSupplier ,INVALID_SUPPLIER_ID));
 	}
 }

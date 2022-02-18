@@ -52,6 +52,8 @@
 
 - Adicionando testes unitarios para product service
 
+- Adicionando testes unitarios para category controller e supplier controller
+
 ### idéias de melhorias:
 
 - todo: unit tests and integration tests

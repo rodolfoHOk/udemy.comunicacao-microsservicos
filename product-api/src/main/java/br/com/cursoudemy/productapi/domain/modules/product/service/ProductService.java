@@ -164,7 +164,7 @@ public class ProductService {
 
 	private void validateExistById (Integer id) {
 		if (!productRepository.existsById(id)) {
-			throw new ValidationException("Not exist product with id " + id);
+			throw new ResourceNotFoundException("Not exist product with id " + id);
 		}
 	}
 

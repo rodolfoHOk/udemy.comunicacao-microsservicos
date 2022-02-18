@@ -165,10 +165,10 @@ public class ProductServiceTest {
 	}
 	
 	@Test
-	void shouldThrowValidationExceptionWhenDeleteProductWithAInvalidId() {
+	void shouldThrowResourceNotFoundExceptionWhenDeleteProductWithAInvalidId() {
 		when(productRepository.existsById(INVALID_PRODUCT_ID)).thenReturn(false);
 		
-		assertThrows(ValidationException.class, () -> productService.delete(INVALID_PRODUCT_ID));
+		assertThrows(ResourceNotFoundException.class, () -> productService.delete(INVALID_PRODUCT_ID));
 	}
 	
 	@Test
@@ -184,12 +184,12 @@ public class ProductServiceTest {
 	}
 	
 	@Test
-	void shouldThrowValidationExceptionWhenUpdateProductWithAInvalidId() {
+	void shouldThrowResourceNotFoundExceptionWhenUpdateProductWithAInvalidId() {
 		Product expectedUpdatedProduct = createProductWithId(VALID_PRODUCT_ID);
 		
 		when(productRepository.existsById(INVALID_PRODUCT_ID)).thenReturn(false);
 		
-		assertThrows(ValidationException.class, () -> productService.update(expectedUpdatedProduct ,INVALID_PRODUCT_ID));
+		assertThrows(ResourceNotFoundException.class, () -> productService.update(expectedUpdatedProduct ,INVALID_PRODUCT_ID));
 	}
 	
 	@Test

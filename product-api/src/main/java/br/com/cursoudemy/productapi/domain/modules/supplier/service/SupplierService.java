@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import br.com.cursoudemy.productapi.domain.exception.EntityInUseException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
-import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import br.com.cursoudemy.productapi.domain.modules.product.repository.ProductRepository;
 import br.com.cursoudemy.productapi.domain.modules.supplier.model.Supplier;
 import br.com.cursoudemy.productapi.domain.modules.supplier.repository.SupplierRepository;
@@ -59,7 +58,7 @@ public class SupplierService {
 	
 	private void validateExistById (Integer id) {
 		if (!supplierRepository.existsById(id)) {
-			throw new ValidationException("Not exist supplier with id " + id);
+			throw new ResourceNotFoundException("Not exist supplier with id " + id);
 		}
 	}
 	

@@ -22,7 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import br.com.cursoudemy.productapi.domain.exception.EntityInUseException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
-import br.com.cursoudemy.productapi.domain.exception.ValidationException;
 import br.com.cursoudemy.productapi.domain.modules.category.model.Category;
 import br.com.cursoudemy.productapi.domain.modules.category.repository.CategoryRepository;
 import br.com.cursoudemy.productapi.domain.modules.product.repository.ProductRepository;
@@ -133,10 +132,10 @@ public class CategoryServiceTest {
 	}
 	
 	@Test
-	void shouldThrowValidationExceptionWhenDeleteCategoryWithAInvalidId() {
+	void shouldThrowResourceNotFoundExceptionWhenDeleteCategoryWithAInvalidId() {
 		when(categoryRepository.existsById(INVALID_CATEGORY_ID)).thenReturn(false);
 		
-		assertThrows(ValidationException.class, () -> categoryService.delete(INVALID_CATEGORY_ID));
+		assertThrows(ResourceNotFoundException.class, () -> categoryService.delete(INVALID_CATEGORY_ID));
 	}
 	
 	@Test
@@ -160,11 +159,11 @@ public class CategoryServiceTest {
 	}
 	
 	@Test
-	void shouldThrowValidationExceptionWhenUpdateCategoryWithAInvalidId() {
+	void shouldThrowResourceNotFoundExceptionWhenUpdateCategoryWithAInvalidId() {
 		Category expectedUpdatedCategory = new Category(1, "Books");
 		
 		when(categoryRepository.existsById(VALID_CATEGORY_ID)).thenReturn(false);
 		
-		assertThrows(ValidationException.class, () -> categoryService.update(expectedUpdatedCategory, VALID_CATEGORY_ID));
+		assertThrows(ResourceNotFoundException.class, () -> categoryService.update(expectedUpdatedCategory, VALID_CATEGORY_ID));
 	}
 }
