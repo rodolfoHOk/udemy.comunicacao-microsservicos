@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,8 +26,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import br.com.cursoudemy.productapi.api.dto.SuccessResponse;
 import br.com.cursoudemy.productapi.api.exceptionhandler.ApiExceptionHandler;
 import br.com.cursoudemy.productapi.api.modules.supplier.assembler.SupplierRequestDisassembler;
+import br.com.cursoudemy.productapi.api.modules.supplier.assembler.SupplierResponseAssembler;
 import br.com.cursoudemy.productapi.api.modules.supplier.dto.SupplierRequest;
 import br.com.cursoudemy.productapi.domain.exception.EntityInUseException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
@@ -61,23 +64,24 @@ public class SupplierControllerTest {
 	
 	@Test
 	void shouldReturnCreatedAndCreatedSupplierWhenPostIsCalled() throws Exception {
-		// given
 		SupplierRequest supplierRequest = new SupplierRequest();
 		supplierRequest.setName(VALID_NAME);
 		Supplier savedSupplier = new Supplier(VALID_ID, VALID_NAME);
-		// when 
+		String expectedJson = JsonConversionUnit.asJsonString(
+				SupplierResponseAssembler.toModel(savedSupplier));
+
 		when(supplierService.save(SupplierRequestDisassembler.toDomainObject(supplierRequest)))
 			.thenReturn(savedSupplier);
-		// then
+
 		mockMvc.perform(post(BASE_URL)
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(JsonConversionUnit.asJsonString(supplierRequest)))
 			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.name", is(equalTo(supplierRequest.getName()))));
+			.andExpect(content().string(expectedJson));
 	}
 	
 	@Test
-	void shouldReturnAnErrorWhenPostIsCalledWithoutRequiredField() throws Exception {
+	void shouldReturnBadRequestWhenPostIsCalledWithoutRequiredField() throws Exception {
 		SupplierRequest supplierRequest = new SupplierRequest();
 		
 		mockMvc.perform(post(BASE_URL)
@@ -140,7 +144,7 @@ public class SupplierControllerTest {
 	}
 	
 	@Test
-	void shouldReturnOkAndAEmptyListWhenGetByNameIsCalledWithInvalidDescription() throws Exception {
+	void shouldReturnOkAndAEmptyListWhenGetByNameIsCalledWithInvalidName() throws Exception {
 		when(supplierService.findByName(INVALID_NAME)).thenReturn(Collections.emptyList());
 		
 		mockMvc.perform(get(BASE_URL + "/name/" + INVALID_NAME).contentType(MediaType.APPLICATION_JSON))
@@ -149,12 +153,14 @@ public class SupplierControllerTest {
 	
 	@Test
 	void shouldReturnOkAndASuccessResponseWhenDeleteByIdIsCalled() throws Exception {
+		SuccessResponse expectedSuccessResponse = SuccessResponse.create("The supplier was deleted.");
+		String expectedJson = JsonConversionUnit.asJsonString(expectedSuccessResponse);
+		
 		doNothing().when(supplierService).delete(VALID_ID);
 		
 		mockMvc.perform(delete(BASE_URL + "/" + VALID_ID).contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status", is(equalTo(200))))
-			.andExpect(jsonPath("$.message", is(equalTo("The supplier was deleted."))));
+			.andExpect(content().string(expectedJson));
 	}
 	
 	@Test
@@ -202,6 +208,16 @@ public class SupplierControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(JsonConversionUnit.asJsonString(supplierRequest)))
 			.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	void shouldReturnBadRequestWhenUpdateByIdIsCalledWithoutRequiredField() throws Exception {
+		SupplierRequest supplierRequest = new SupplierRequest();
+		
+		mockMvc.perform(put(BASE_URL + "/" + INVALID_ID)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(JsonConversionUnit.asJsonString(supplierRequest)))
+			.andExpect(status().isBadRequest());
 	}
 	
 }

@@ -9,6 +9,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -25,8 +26,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.servlet.view.json.MappingJackson2JsonView;
 
+import br.com.cursoudemy.productapi.api.dto.SuccessResponse;
 import br.com.cursoudemy.productapi.api.exceptionhandler.ApiExceptionHandler;
 import br.com.cursoudemy.productapi.api.modules.category.assembler.CategoryRequestDisassembler;
+import br.com.cursoudemy.productapi.api.modules.category.assembler.CategoryResponseAssembler;
 import br.com.cursoudemy.productapi.api.modules.category.dto.CategoryRequest;
 import br.com.cursoudemy.productapi.domain.exception.EntityInUseException;
 import br.com.cursoudemy.productapi.domain.exception.ResourceNotFoundException;
@@ -65,6 +68,8 @@ public class CategoryControllerTest {
 		CategoryRequest categoryRequest = new CategoryRequest();
 		categoryRequest.setDescription(VALID_DESCRIPTION);
 		Category savedCategory = new Category(VALID_ID, VALID_DESCRIPTION);
+		String expectedJson = JsonConversionUnit.asJsonString(
+				CategoryResponseAssembler.toModel(savedCategory));
 		// when 
 		when(categoryService.save(CategoryRequestDisassembler.toDomainObject(categoryRequest)))
 			.thenReturn(savedCategory);
@@ -73,11 +78,11 @@ public class CategoryControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(JsonConversionUnit.asJsonString(categoryRequest)))
 			.andExpect(status().isCreated())
-			.andExpect(jsonPath("$.description", is(equalTo(categoryRequest.getDescription()))));
+			.andExpect(content().string(expectedJson));
 	}
 	
 	@Test
-	void shouldReturnAnErrorWhenPostIsCalledWithoutRequiredField() throws Exception {
+	void shouldReturnBadRequestWhenPostIsCalledWithoutRequiredField() throws Exception {
 		CategoryRequest categoryRequest = new CategoryRequest();
 		
 		mockMvc.perform(post(BASE_URL)
@@ -149,12 +154,14 @@ public class CategoryControllerTest {
 	
 	@Test
 	void shouldReturnOkAndASuccessResponseWhenDeleteByIdIsCalled() throws Exception {
+		SuccessResponse expectedSuccessResponse = SuccessResponse.create("The category was deleted.");
+		String expectedJson = JsonConversionUnit.asJsonString(expectedSuccessResponse);
+		
 		doNothing().when(categoryService).delete(VALID_ID);
 		
 		mockMvc.perform(delete(BASE_URL + "/" + VALID_ID).contentType(MediaType.APPLICATION_JSON))
 			.andExpect(status().isOk())
-			.andExpect(jsonPath("$.status", is(equalTo(200))))
-			.andExpect(jsonPath("$.message", is(equalTo("The category was deleted."))));
+			.andExpect(content().string(expectedJson));
 	}
 	
 	@Test
@@ -202,6 +209,16 @@ public class CategoryControllerTest {
 				.contentType(MediaType.APPLICATION_JSON)
 				.content(JsonConversionUnit.asJsonString(categoryRequest)))
 			.andExpect(status().isNotFound());
+	}
+	
+	@Test
+	void shouldReturnBadRequestWhenUpdateByIdIsCalledWithoutRequiredField() throws Exception {
+		CategoryRequest categoryRequest = new CategoryRequest();
+		
+		mockMvc.perform(put(BASE_URL + "/" + INVALID_ID)
+				.contentType(MediaType.APPLICATION_JSON)
+				.content(JsonConversionUnit.asJsonString(categoryRequest)))
+			.andExpect(status().isBadRequest());
 	}
 	
 }
