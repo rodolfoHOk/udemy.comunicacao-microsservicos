@@ -1,0 +1,19 @@
+spring:
+  rabbitmq:
+    host: ${RABBITMQ_HOST:localhost}
+    port: ${RABBITMQ_PORT:5672}
+    username: ${RABBITMQ_USERNAME:guest}
+    password: ${RABBITMQ_PASSWORD:guest}
+
+app-config:
+  rabbit:
+    exchange:
+      product: product-test.topic
+      
+    routingKey:
+      product-stock: product-test-stock-update.routingKey
+      sales-confirmation: sales-test-confirmation.routingKey
+
+    queue:
+      product-stock: product-test-stock-update.queue
+      sales-confirmation: sales-test-confirmation.queue

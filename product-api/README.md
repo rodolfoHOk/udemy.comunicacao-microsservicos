@@ -58,5 +58,5 @@
 
 ### idéias de melhorias:
 
-- todo: unit tests and integration tests
+- todo: integration tests
 
