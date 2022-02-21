@@ -17,3 +17,6 @@ app-config:
     queue:
       product-stock: product-test-stock-update.queue
       sales-confirmation: sales-test-confirmation.queue
+
+test:
+  token: ${TEST_TOKEN}
