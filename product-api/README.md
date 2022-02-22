@@ -1,5 +1,49 @@
 # Product API do Curso Comunicações entre Microsserviços
 
+## Tecnologias 
+
+- Java 11
+
+- Spring Boot
+
+- REST API
+
+- PostgreSQL
+
+- RabbitMQ
+
+- JWT
+
+- Spring Cloud OpenFeign
+
+- Docker
+
+### Bibliotecas
+
+- Spring WEB
+
+- Spring Data JPA
+
+- PostgreSQL Driver
+
+- Spring AMQP (RabbitMQ)
+
+- Spring Cloud OpenFeign
+
+- Spring DevTools
+
+- Lombok
+
+- Spring OAuth2 Resource Server
+
+- Spring Validation
+
+- SpringFox (OpenAPI)
+
+- Awaitility (Integration Test)
+
+- RestAssured (Integration Test)
+
 ## Resumo da implementação do Micro-serviço de Produtos:
 
 - Criação do projeto Product API com Java, Spring Boot e PostgreSQL
@@ -46,17 +90,12 @@
 
 - Adicionando documentação OpenApi
 
-- Adicionando testes unitarios para category service
+- Adicionando testes unitarios para category service, supplier service e product service
 
-- Adicionando testes unitarios para supplier service
+- Adicionando testes unitarios para category controller, supplier controller e product controller
 
-- Adicionando testes unitarios para product service
+- Adicionado testes de integração para product stock listener, sales confirmation sender e sales client
 
-- Adicionando testes unitarios para category controller e supplier controller
+## Links
 
-- Adicionando testes unitarios para product controller
-
-### idéias de melhorias:
-
-- todo: integration tests
-
+[Repositório dos Projetos do Curso](https://github.com/rodolfoHOk/udemy.comunicacao-microsservicos)

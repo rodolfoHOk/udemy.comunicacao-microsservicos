@@ -1,5 +1,45 @@
 # Authorization API do Curso Cominicações entre Microsserviços
 
+## Tecnologias 
+
+- TypeScript
+
+- NodeJS
+
+- Express
+
+- Sequelize
+
+- REST API
+
+- PostgreSQL
+
+- JWT
+
+- Docker
+
+### Bibliotecas
+
+- bcrypt
+
+- cors
+
+- express
+
+- jsonwebtoken
+
+- pg (PostgreSQL)
+
+- sequelize
+
+- uuid
+
+- typescript (desenvolvimento)
+
+- ts-node-dev (desenvolvimento)
+
+- @types/bcrypt, @types/cors, @types/express, @types/jsonwebtoken, @types/node, @types/pg, @types/uuid (desenvolvimento)
+
 ## Resumo da implementação do Micro-serviço de Autenticação:
 
 - Criação do projeto Auth API com Node.js, Express.js, JWT e PostgreSQL

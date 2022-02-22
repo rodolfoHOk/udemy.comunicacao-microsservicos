@@ -1,5 +1,47 @@
 # Sales API do Curso Comunicações entre Microsserviços
 
+## Tecnologias
+
+- Typescript
+
+- Node
+
+- Express
+
+- MongoDB
+
+- RabbitMQ
+
+- Mongoose
+
+- REST API
+
+- JWT
+
+- Docker
+
+### Bibliotecas
+
+- amqplib (RabbitMQ)
+
+- axios
+
+- cors
+
+- express
+
+- jsonwebtoken
+
+- mongoose
+
+- uuid
+
+- typescript (desenvolvimento)
+
+- ts-node-dev (desenvolvimento)
+
+- @types/amqplib, @types/axios, @types/cors, @types/express, @types/jsonwebtoken, @types/node, @types/uuid (desenvolvimento)
+
 ## Resumo da implementação do Micro-serviço de Vendas:
 
 - Criação do projeto Sales API com Node.js, Express.js, JWT e MongoDB
@@ -78,4 +120,6 @@
 
 - adicionar .gitignore para node
 
-## End
+## Links
+
+[Repositório dos Projetos do Curso](https://github.com/rodolfoHOk/udemy.comunicacao-microsservicos)

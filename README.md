@@ -1,6 +1,6 @@
-# Comunicacao entre Microsservicos - Udemy
+# Curso Comunicacao entre Microsservicos - Udemy
 
-## Resumo do curso
+## Resumo do Curso
 
 - Comunicação síncrona entre serviços utilizando chamadas de API REST
 
@@ -17,6 +17,32 @@
 - Como realizar o deploy de microsserviços no Heroku
 
 - Como proteger sua aplicação com variáveis de ambiente
+
+## Informações sobre os Projetos do Curso
+
+[Auth-API](auth-api/README.md)
+
+[Product-API](product-api/README.md)
+
+[Sales-API](sales-api/REAME.md)
+
+## Implementações além do curso
+
+### Auth-api e Sales-api em NodeJS
+
+- Typescript
+
+### Product-api em Java:
+
+- DDD
+
+- Spring Validation
+
+- OpenApi (SpringFox)
+
+- Testes Unitarios (classes de serviços e controller)
+
+- Testes de Integração (RabbitMQ Listener, RabbitMQ Sender e Feign Client)  
 
 ## Docker containers
 
@@ -44,4 +70,3 @@
 - Criar container do Message Broker (RabbitMQ):
 
 		docker run --name sales-rabbit -p 5672:5672 -p 25676:25676 -p 15672:15672 -d rabbitmq:3-management
-
