@@ -1,6 +1,6 @@
 # Authorization API do Curso Cominicações entre Microsserviços
 
-## Tecnologias 
+## Tecnologias
 
 - TypeScript
 
@@ -63,6 +63,8 @@
 - Implementando segurança nos endpoints
 
 - Implementando tracing de requisições entre serviços em Auth-API
+
+- Definindo variáveis de ambiente nas aplicações
 
 ### Criar/iniciar uma aplicação em node com Typescript
 

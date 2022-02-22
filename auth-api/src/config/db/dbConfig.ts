@@ -1,7 +1,16 @@
 import { Sequelize } from 'sequelize';
 
-const sequelize: Sequelize = new Sequelize('auth', 'postgres', 'postgres', {
-  host: 'localhost',
+import {
+  DB_HOST,
+  DB_PORT,
+  DB_NAME,
+  DB_USER,
+  DB_PASSWORD,
+} from '../constants/secrets';
+
+const sequelize: Sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
+  host: DB_HOST,
+  port: Number(DB_PORT),
   dialect: 'postgres',
   quoteIdentifiers: false,
   define: {

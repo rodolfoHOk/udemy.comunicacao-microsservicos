@@ -94,7 +94,9 @@
 
 - Adicionando testes unitarios para category controller, supplier controller e product controller
 
-- Adicionado testes de integração para product stock listener, sales confirmation sender e sales client
+- Adicionando testes de integração para product stock listener, sales confirmation sender e sales client
+
+- Definindo as variáveis de ambiente nas aplicações
 
 ## Links
 
