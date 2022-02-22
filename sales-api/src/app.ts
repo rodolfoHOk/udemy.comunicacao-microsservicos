@@ -16,7 +16,7 @@ const app: Express = express();
 startApplication();
 
 async function startApplication() {
-  if (env.NODE_ENV !== CONTAINER_ENV) {
+  if (env.NODE_ENV === CONTAINER_ENV) {
     console.info('Waiting for RabbitMQ and MongoDB containers to start...');
     setInterval(() => {
       connectMongoDB();

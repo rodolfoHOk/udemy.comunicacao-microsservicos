@@ -1,6 +1,7 @@
 package br.com.cursoudemy.productapi.api.modules.product.assembler;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import br.com.cursoudemy.productapi.api.modules.category.assembler.CategoryResponseAssembler;
 import br.com.cursoudemy.productapi.api.modules.product.dto.ProductResponse;
@@ -22,7 +23,7 @@ public class ProductResponseAssembler {
 	}
 	
 	public static List<ProductResponse> toCollectionModel (List<Product> products) {
-		return products.stream().map(product -> toModel(product)).toList();
+		return products.stream().map(product -> toModel(product)).collect(Collectors.toList());
 	}
 	
 }

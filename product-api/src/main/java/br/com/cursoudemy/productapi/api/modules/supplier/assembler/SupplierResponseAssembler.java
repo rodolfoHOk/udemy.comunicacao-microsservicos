@@ -1,6 +1,7 @@
 package br.com.cursoudemy.productapi.api.modules.supplier.assembler;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.BeanUtils;
 
@@ -16,6 +17,6 @@ public class SupplierResponseAssembler {
 	}
 	
 	public static List<SupplierResponse> toCollectionModel (List<Supplier> suppliers) {
-		return suppliers.stream().map(supplier -> toModel(supplier)).toList();
+		return suppliers.stream().map(supplier -> toModel(supplier)).collect(Collectors.toList());
 	}
 }
