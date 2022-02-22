@@ -5,7 +5,8 @@
   "license": "MIT",
   "scripts": {
     "dev": "ts-node-dev --exit-child src/app.ts",
-    "build": "tsc --build"
+    "build": "tsc --build",
+    "start": "node dist/app.js"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
