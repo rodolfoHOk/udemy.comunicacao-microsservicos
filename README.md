@@ -24,7 +24,7 @@
 
 [Product-API](product-api/README.md)
 
-[Sales-API](sales-api/REAME.md)
+[Sales-API](sales-api/README.md)
 
 ## Implementações além do curso
 
