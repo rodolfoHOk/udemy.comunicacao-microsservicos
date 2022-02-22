@@ -13,12 +13,20 @@ const sequelize: Sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, {
   port: Number(DB_PORT),
   dialect: 'postgres',
   quoteIdentifiers: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
   define: {
     timestamps: false,
     underscored: true,
     freezeTableName: true,
   },
-  pool: { acquire: 180000 },
+  pool: {
+    acquire: 180000,
+  },
 });
 
 sequelize
