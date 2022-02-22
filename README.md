@@ -26,6 +26,20 @@
 
 [Sales-API](sales-api/README.md)
 
+## Deploy
+
+- Auth-API : API em NodeJs -> Heroku e PostgreSQL -> Heroku
+
+		https://curso-com-mserv-auth-api.herokuapp.com
+
+- Product-API : API em Java -> Heroku, PostgreSQL -> Heroku, RabbitMQ -> CloudAMQP
+
+		https://curso-com-mserv-product-api.herokuapp.com/swagger-ui/index.html
+
+- Sales-API : API em NodeJs -> Heroku, MongoDB -> Atlas MongoDB, RabbitMQ -> CloudAMQP
+
+		https://curso-com-mserv-sales-api.herokuapp.com
+
 ## Implementações além do curso
 
 ### Auth-api e Sales-api em NodeJS
