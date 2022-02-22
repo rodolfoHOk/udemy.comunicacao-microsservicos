@@ -66,6 +66,8 @@
 
 - Definindo variáveis de ambiente nas aplicações
 
+- - Últimos ajustes antes de subir tudo integrado
+
 ### Criar/iniciar uma aplicação em node com Typescript
 
 - yarn init -y

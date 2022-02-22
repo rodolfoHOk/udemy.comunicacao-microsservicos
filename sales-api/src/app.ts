@@ -8,12 +8,26 @@ import tracing from './config/tracing';
 
 const env = process.env;
 const PORT = env.PORT || 8082;
+const CONTAINER_ENV = 'container';
+const TREE_MINUTES = 180000;
 
 const app: Express = express();
 
-connectMongoDB();
-createInitialData();
-connectRabbitMq();
+startApplication();
+
+async function startApplication() {
+  if (env.NODE_ENV !== CONTAINER_ENV) {
+    console.info('Waiting for RabbitMQ and MongoDB containers to start...');
+    setInterval(() => {
+      connectMongoDB();
+      connectRabbitMq();
+    }, TREE_MINUTES);
+  } else {
+    connectMongoDB();
+    createInitialData();
+    connectRabbitMq();
+  }
+}
 
 app.use(express.json());
 
@@ -23,6 +37,11 @@ app.get('/api/status', async (req, res) => {
     status: 'up',
     httpStatus: 200,
   });
+});
+
+app.get('/api/initial-data', (req, res) => {
+  createInitialData();
+  return res.json({ message: 'Data created.' });
 });
 
 app.use(tracing);

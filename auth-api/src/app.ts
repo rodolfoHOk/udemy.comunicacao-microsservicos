@@ -6,10 +6,17 @@ import tracing from './config/tracing';
 
 const env = process.env;
 const PORT = env.PORT || 8080;
+const CONTAINER_ENV = 'container';
 
 const app: Express = express();
 
-db.createInitialData();
+startApplication();
+
+function startApplication() {
+  if (env.NODE_ENV !== CONTAINER_ENV) {
+    db.createInitialData();
+  }
+}
 
 app.use(express.json());
 
@@ -19,6 +26,11 @@ app.get('/api/status', (req, res) => {
     status: 'up',
     httpStatus: 200,
   });
+});
+
+app.get('/api/initial-data', (req, res) => {
+  db.createInitialData();
+  return res.json({ message: 'Data created.' });
 });
 
 app.use(tracing);
