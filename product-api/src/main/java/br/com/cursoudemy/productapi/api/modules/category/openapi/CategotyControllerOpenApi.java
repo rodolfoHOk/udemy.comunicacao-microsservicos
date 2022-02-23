@@ -27,12 +27,16 @@ public interface CategotyControllerOpenApi {
 			CategoryRequest categoryRequest);
 
 	@ApiOperation("List all categories")
+	@ApiResponses({
+		@ApiResponse(responseCode = "401", description = "Unauthorized access")
+	})
 	List<CategoryResponse> findAll();
 
 	@ApiOperation("Search a category by ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "400", description = "Category ID invalid",
 				content = @Content(schema = @Schema(implementation = ProblemDetails.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Category not found",
 				content = @Content(schema = @Schema(implementation = ProblemDetails.class)))
 	})
@@ -43,7 +47,8 @@ public interface CategotyControllerOpenApi {
 	@ApiOperation("Search a category by description")
 	@ApiResponses({
 		@ApiResponse(responseCode = "400", description = "Category description invalid",
-				content = @Content(schema = @Schema(implementation = ProblemDetails.class)))
+				content = @Content(schema = @Schema(implementation = ProblemDetails.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized access")
 	})
 	List<CategoryResponse> findByDescription(
 			@ApiParam(value = "Category description", example = "Books", required = true) 

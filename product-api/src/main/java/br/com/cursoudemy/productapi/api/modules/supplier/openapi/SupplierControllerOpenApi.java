@@ -26,12 +26,16 @@ public interface SupplierControllerOpenApi {
 			SupplierRequest supplierRequest);
 
 	@ApiOperation("List all suppliers")
+	@ApiResponses({
+		@ApiResponse(responseCode = "401", description = "Unauthorized access")
+	})
 	List<SupplierResponse> findAll();
 
 	@ApiOperation("Search a supplier by ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "400", description = "Supplier ID invalid",
 				content = @Content(schema = @Schema(implementation = ProblemDetails.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Supplier not found",
 				content = @Content(schema = @Schema(implementation = ProblemDetails.class)))
 	})
@@ -42,7 +46,8 @@ public interface SupplierControllerOpenApi {
 	@ApiOperation("Search a supplier by name")
 	@ApiResponses({
 		@ApiResponse(responseCode = "400", description = "Supplier name invalid",
-				content = @Content(schema = @Schema(implementation = ProblemDetails.class)))
+				content = @Content(schema = @Schema(implementation = ProblemDetails.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized access")
 	})
 	List<SupplierResponse> findByName(
 			@ApiParam(value = "Supplier name", example = "Saraiva bookstore", required = true) 

@@ -30,12 +30,16 @@ public interface ProductControllerOpenApi {
 			ProductRequest productRequest);
 
 	@ApiOperation("List all products")
+	@ApiResponses({
+		@ApiResponse(responseCode = "401", description = "Unauthorized access")
+	})
 	List<ProductResponse> findAll();
 
 	@ApiOperation("Search a product by ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "400", description = "Product ID invalid",
 				content = @Content(schema = @Schema(implementation = ProblemDetails.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Product not found",
 				content = @Content(schema = @Schema(implementation = ProblemDetails.class)))
 	})
@@ -46,7 +50,8 @@ public interface ProductControllerOpenApi {
 	@ApiOperation("Search a product by name")
 	@ApiResponses({
 		@ApiResponse(responseCode = "400", description = "Product name invalid",
-				content = @Content(schema = @Schema(implementation = ProblemDetails.class)))
+				content = @Content(schema = @Schema(implementation = ProblemDetails.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized access")
 	})
 	List<ProductResponse> findByName(
 			@ApiParam(value = "Product name", example = "Books", required = true) 
@@ -55,7 +60,8 @@ public interface ProductControllerOpenApi {
 	@ApiOperation("Search a product by category ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "400", description = "Category ID invalid",
-				content = @Content(schema = @Schema(implementation = ProblemDetails.class)))
+				content = @Content(schema = @Schema(implementation = ProblemDetails.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized access")
 	})
 	List<ProductResponse> findByCategoryId(
 			@ApiParam(value = "Category ID", example = "1", required = true)
@@ -64,7 +70,8 @@ public interface ProductControllerOpenApi {
 	@ApiOperation("Search a product by supplier ID")
 	@ApiResponses({
 		@ApiResponse(responseCode = "400", description = "Supplier ID invalid",
-				content = @Content(schema = @Schema(implementation = ProblemDetails.class)))
+				content = @Content(schema = @Schema(implementation = ProblemDetails.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized access")
 	})
 	List<ProductResponse> findBySupplierId(
 			@ApiParam(value = "Supplier ID", example = "1", required = true)
@@ -96,6 +103,7 @@ public interface ProductControllerOpenApi {
 	@ApiResponses({
 		@ApiResponse(responseCode = "400", description = "Product ID invalid",
 				content = @Content(schema = @Schema(implementation = ProblemDetails.class))),
+		@ApiResponse(responseCode = "401", description = "Unauthorized access"),
 		@ApiResponse(responseCode = "404", description = "Product not found",
 				content = @Content(schema = @Schema(implementation = ProblemDetails.class)))
 	})

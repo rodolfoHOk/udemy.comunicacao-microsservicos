@@ -2,6 +2,7 @@ package br.com.cursoudemy.productapi.core.openapi;
 
 import java.lang.reflect.Field;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -25,11 +26,19 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.builders.RepresentationBuilder;
 import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.builders.RequestParameterBuilder;
 import springfox.documentation.builders.ResponseBuilder;
 import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.AuthorizationScope;
 import springfox.documentation.service.Contact;
+import springfox.documentation.service.HttpAuthenticationScheme;
+import springfox.documentation.service.ParameterType;
+import springfox.documentation.service.RequestParameter;
 import springfox.documentation.service.Response;
+import springfox.documentation.service.SecurityReference;
+import springfox.documentation.service.SecurityScheme;
 import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
 import springfox.documentation.spring.web.json.JacksonModuleRegistrar;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.spring.web.plugins.WebFluxRequestHandlerProvider;
@@ -54,7 +63,20 @@ public class SpringFoxConfig {
 				.globalResponses(HttpMethod.POST, globalPostPutResponses())
 				.globalResponses(HttpMethod.PUT, globalPostPutResponses())
 				.globalResponses(HttpMethod.DELETE, globalDeleteResponses())
-				.ignoredParameterTypes(WebRequest.class);
+				.ignoredParameterTypes(WebRequest.class)
+				.globalRequestParameters(requestParameters())
+				.securitySchemes(Collections.singletonList(securityScheme()))
+				.securityContexts(Collections.singletonList(securityContext()));
+	}
+	
+	private List<RequestParameter> requestParameters() {
+		RequestParameter transactionidParameter = new RequestParameterBuilder()
+				.name("transactionid")
+				.in(ParameterType.HEADER)
+				.required(true)
+				.description("Transaction ID")
+				.build();
+		return Collections.singletonList(transactionidParameter);
 	}
 	
 	private ApiInfo apiInfoV1() {
@@ -66,18 +88,43 @@ public class SpringFoxConfig {
 				.build();
 	}
 	
+	private SecurityScheme securityScheme() {
+		return HttpAuthenticationScheme.JWT_BEARER_BUILDER.name("Authorization").build();
+	}
+	
+	private SecurityContext securityContext() {
+		return SecurityContext.builder()
+				.securityReferences(Collections.singletonList(securityReference()))
+				.operationSelector(operationContext -> true)
+				.build();
+	}
+	
+	private SecurityReference securityReference() {
+		return SecurityReference.builder()
+				.reference("Authorization")
+				.scopes(scopes())
+				.build();
+	}
+	
+	private AuthorizationScope[] scopes() {
+		AuthorizationScope[] authorizationScopes = new AuthorizationScope[2];
+		authorizationScopes[0] = new AuthorizationScope("READ", "read access");
+		authorizationScopes[1] = new AuthorizationScope("WRITE", "write access");
+		return authorizationScopes;
+	}
+	
 	private List<Response> globalGetResponses() {
 		return Arrays.asList(
-				new ResponseBuilder()
-					.code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
-					.description("Internal server error")
-					.representation(MediaType.APPLICATION_JSON)
-					.apply(getProblemDetailModelReference())
-					.build(),
-				new ResponseBuilder()
-					.code(String.valueOf(HttpStatus.NOT_ACCEPTABLE.value()))
-					.description("Resource cannot produce a consumer-accepted representation")
-					.build()
+					new ResponseBuilder()
+						.code(String.valueOf(HttpStatus.INTERNAL_SERVER_ERROR.value()))
+						.description("Internal server error")
+						.representation(MediaType.APPLICATION_JSON)
+						.apply(getProblemDetailModelReference())
+						.build(),
+					new ResponseBuilder()
+						.code(String.valueOf(HttpStatus.NOT_ACCEPTABLE.value()))
+						.description("Resource cannot produce a consumer-accepted representation")
+						.build()
 				);
 	}
 	
@@ -104,6 +151,10 @@ public class SpringFoxConfig {
 						.description("Request body is in an unsupported format")
 						.representation(MediaType.APPLICATION_JSON)
 						.apply(getProblemDetailModelReference())
+						.build(),
+					new ResponseBuilder()
+						.code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+						.description("Unauthorized access")
 						.build()
 				);
 	}
@@ -121,6 +172,10 @@ public class SpringFoxConfig {
 						.description("Internal server error")
 						.representation(MediaType.APPLICATION_JSON)
 						.apply(getProblemDetailModelReference())
+						.build(),
+					new ResponseBuilder()
+						.code(String.valueOf(HttpStatus.UNAUTHORIZED.value()))
+						.description("Unauthorized access")
 						.build()
 				);
 	}
