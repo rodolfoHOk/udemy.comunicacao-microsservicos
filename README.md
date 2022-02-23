@@ -28,15 +28,15 @@
 
 ## Deploy
 
-- Auth-API : API em NodeJs -> Heroku e PostgreSQL -> Heroku
+- Auth-API : API em NodeJs -> Heroku | PostgreSQL -> Heroku | Logs -> Heroku Coralogix Kibana
 
 		https://curso-com-mserv-auth-api.herokuapp.com
 
-- Product-API : API em Java -> Heroku, PostgreSQL -> Heroku, RabbitMQ -> CloudAMQP
+- Product-API : API em Java -> Heroku | PostgreSQL -> Heroku | RabbitMQ -> CloudAMQP | Logs -> Heroku Coralogix Kibana
 
 		https://curso-com-mserv-product-api.herokuapp.com/swagger-ui/index.html
 
-- Sales-API : API em NodeJs -> Heroku, MongoDB -> Atlas MongoDB, RabbitMQ -> CloudAMQP
+- Sales-API : API em NodeJs -> Heroku | MongoDB -> Atlas MongoDB | RabbitMQ -> CloudAMQP | Logs -> Heroku Coralogix Kibana
 
 		https://curso-com-mserv-sales-api.herokuapp.com
 
